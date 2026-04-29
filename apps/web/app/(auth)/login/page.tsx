@@ -8,13 +8,13 @@ export default function LoginPage() {
       {/* Auth forms will be wired in Phase 7 */}
       <div className="space-y-4">
         <a
-          href="/auth/login/teacher"
+          href="/login/teacher"
           className="block w-full text-center bg-primary hover:bg-primary-hover text-white font-semibold py-3 px-6 rounded-sm transition-colors"
         >
           Đăng nhập Giáo viên
         </a>
         <a
-          href="/auth/login/parent"
+          href="/login/parent"
           className="block w-full text-center border border-border text-ink font-semibold py-3 px-6 rounded-sm hover:bg-surface transition-colors"
         >
           Đăng nhập Phụ huynh / Học sinh
