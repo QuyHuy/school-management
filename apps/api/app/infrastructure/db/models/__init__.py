@@ -1,2 +1,1 @@
-# Import all models here so Alembic can detect them in env.py
-# Models will be added as each phase is implemented
+from app.infrastructure.db.models.user import OrganizationModel, UserModel  # noqa: F401
