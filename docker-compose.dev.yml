@@ -1,0 +1,46 @@
+services:
+  nginx:
+    ports:
+      - "8080:80"
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+      - NODE_ENV=development
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./apps/api:/app
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://school:school@postgres:5432/school
+      - REDIS_URL=redis://redis:6379/0
+      - JWT_SECRET_KEY=dev-secret-key-change-in-production
+      - ZALO_OA_ACCESS_TOKEN=placeholder
+      - ZALO_OA_SECRET_KEY=placeholder
+      - ALLOWED_ORIGINS=["http://localhost:3000","http://localhost:8080"]
+      - ENVIRONMENT=development
+      - DEBUG=true
+
+  celery:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./apps/api:/app
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://school:school@postgres:5432/school
+      - REDIS_URL=redis://redis:6379/0
+      - ZALO_OA_ACCESS_TOKEN=placeholder
+      - ZALO_OA_SECRET_KEY=placeholder
+      - ENVIRONMENT=development

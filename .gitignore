@@ -1,0 +1,58 @@
+# Environment — never commit
+.env
+.env.local
+.env.*.local
+
+# Superpowers brainstorm artifacts
+.superpowers/
+
+# Node
+node_modules/
+.pnpm-store/
+
+# Next.js
+.next/
+out/
+build/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Turbo
+.turbo/
+
+# Docker
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# PWA
+apps/web/public/sw.js
+apps/web/public/workbox-*.js
+
+# Build artifacts
+apps/web/public/icons/
+
+# Alembic (keep versions, ignore pycache)
+apps/api/alembic/__pycache__/
+apps/api/alembic/versions/__pycache__/

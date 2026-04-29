@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap");
+
+@layer base {
+  :root {
+    /* Airbnb-inspired design tokens */
+    --color-primary: #ff385c;
+    --color-primary-hover: #e00b41;
+    --color-bg: #ffffff;
+    --color-surface: #f7f7f7;
+    --color-border: #dddddd;
+    --color-text: #222222;
+    --color-text-2: #6a6a6a;
+    --color-text-3: #929292;
+    --color-error: #c13515;
+
+    /* shadcn/ui CSS variable overrides */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 13%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 13%;
+    --primary: 348 100% 61%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 97%;
+    --secondary-foreground: 0 0% 13%;
+    --muted: 0 0% 97%;
+    --muted-foreground: 0 0% 42%;
+    --accent: 0 0% 97%;
+    --accent-foreground: 0 0% 13%;
+    --destructive: 14 78% 43%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 87%;
+    --input: 0 0% 87%;
+    --ring: 0 0% 13%;
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: Inter, -apple-system, system-ui, Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-canvas text-ink font-medium;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Stacked 3-layer shadow from DESIGN.md */
+  .shadow-card {
+    box-shadow:
+      rgba(0, 0, 0, 0.02) 0 0 0 1px,
+      rgba(0, 0, 0, 0.04) 0 2px 6px 0,
+      rgba(0, 0, 0, 0.10) 0 4px 8px 0;
+  }
+
+  /* Display text — Inter tracking */
+  .text-display {
+    letter-spacing: -0.02em;
+  }
+}
