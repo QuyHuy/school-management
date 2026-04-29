@@ -18,7 +18,7 @@ export function LoginForm() {
     setLoading(true);
     try {
       await login(email, password);
-      router.push("/teacher/dashboard" as any);
+      router.push("/dashboard");
     } catch {
       setError("Email hoặc mật khẩu không đúng.");
     } finally {
