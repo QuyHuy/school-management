@@ -78,3 +78,8 @@ async def health():
 from app.interfaces.api.v1.routers import auth  # noqa: E402
 
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+
+from app.interfaces.api.v1.routers import classes, students  # noqa: E402
+
+app.include_router(students.router, prefix="/api/v1/students", tags=["students"])
+app.include_router(classes.router, prefix="/api/v1/classes", tags=["classes"])
