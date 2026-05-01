@@ -13,12 +13,14 @@ services:
 
   web:
     build:
-      context: ./apps/web
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: apps/web/Dockerfile.dev
     volumes:
-      - ./apps/web:/app
-      - /app/node_modules
-      - /app/.next
+      - ./apps/web:/monorepo/apps/web
+      - ./packages:/monorepo/packages
+      - /monorepo/node_modules
+      - /monorepo/apps/web/node_modules
+      - /monorepo/apps/web/.next
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8080
       - NEXT_PUBLIC_APP_URL=http://localhost:3000

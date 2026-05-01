@@ -1,9 +1,21 @@
 FROM node:20-alpine
-RUN npm install -g pnpm
+RUN npm install -g pnpm@9.11.0
 
-WORKDIR /app
-COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install
+WORKDIR /monorepo
+
+# Copy monorepo root config first (needed for workspace resolution)
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+
+# Copy workspace packages (needed for workspace:* protocol at install time)
+COPY packages/ packages/
+
+# Copy web app source (overridden by volume mount at runtime)
+COPY apps/web/ apps/web/
+
+# Install from monorepo root so workspace packages resolve correctly
+RUN pnpm install --frozen-lockfile
+
+WORKDIR /monorepo/apps/web
 
 EXPOSE 3000
 CMD ["pnpm", "dev"]

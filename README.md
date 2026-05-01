@@ -58,7 +58,7 @@ make dev
 
 Truy cập:
 - **Web app**: http://localhost:8080
-- **API docs (Swagger)**: http://localhost:8080/api/docs
+- **API docs (Swagger)**: http://localhost:8080/docs
 - **API health**: http://localhost:8080/health
 
 Dừng:

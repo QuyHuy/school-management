@@ -27,4 +27,7 @@ httpx==0.28.0
 pydantic==2.10.3
 pydantic-settings==2.6.1
 
+# Monitoring
+sentry-sdk[fastapi]==2.19.2
+
 # Dev only (moved to requirements-dev.txt for prod)
