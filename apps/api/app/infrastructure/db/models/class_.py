@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, time, timezone
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, SmallInteger, String, Time, UniqueConstraint
+from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, SmallInteger, String, Time, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -35,14 +35,17 @@ class ClassModel(Base):
 
 class ClassScheduleModel(Base):
     __tablename__ = "class_schedules"
+    __table_args__ = (
+        CheckConstraint("day_of_week BETWEEN 0 AND 6", name="ck_class_schedules_day_of_week"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     class_id: Mapped[uuid.UUID] = mapped_column(
         PGUUID(as_uuid=True), ForeignKey("classes.id"), nullable=False, index=True
     )
     day_of_week: Mapped[int] = mapped_column(SmallInteger, nullable=False)  # 0=Mon … 6=Sun
-    start_time: Mapped[time] = mapped_column(Time, nullable=False)
-    end_time: Mapped[time] = mapped_column(Time, nullable=False)
+    start_time: Mapped[time] = mapped_column(Time(timezone=True), nullable=False)
+    end_time: Mapped[time] = mapped_column(Time(timezone=True), nullable=False)
 
 
 class EnrollmentModel(Base):
