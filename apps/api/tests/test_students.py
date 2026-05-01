@@ -75,3 +75,19 @@ async def test_get_student_not_found(client: AsyncClient):
         assert resp.status_code == 404
     finally:
         app.dependency_overrides.pop(get_current_user, None)
+
+
+async def test_get_student(client: AsyncClient):
+    app.dependency_overrides[get_current_user] = _override
+    try:
+        with patch("app.interfaces.api.v1.routers.students.GetStudentUseCase") as MockUC:
+            MockUC.return_value.execute = AsyncMock(return_value=_STUDENT)
+            resp = await client.get(
+                f"/api/v1/students/{_STUDENT_ID}",
+                headers={"Authorization": "Bearer fake"},
+            )
+        assert resp.status_code == 200
+        assert resp.json()["id"] == str(_STUDENT_ID)
+        assert resp.json()["name"] == "Nguyễn Văn A"
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)

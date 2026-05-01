@@ -10,6 +10,8 @@ from app.application.use_cases.classes.delete_schedule import DeleteScheduleUseC
 from app.application.use_cases.classes.enroll_student import EnrollStudentUseCase
 from app.application.use_cases.classes.get_class import GetClassUseCase
 from app.application.use_cases.classes.list_classes import ListClassesUseCase
+from app.application.use_cases.classes.list_enrollments import ListEnrollmentsUseCase
+from app.application.use_cases.classes.list_schedules import ListSchedulesUseCase
 from app.application.use_cases.classes.unenroll_student import UnenrollStudentUseCase
 from app.infrastructure.db.repositories.class_repository import SQLClassRepository
 from app.infrastructure.db.repositories.student_repository import SQLStudentRepository
@@ -74,8 +76,8 @@ async def list_schedules(
     token=Depends(_teacher),
     db: AsyncSession = Depends(get_db),
 ):
-    repo = SQLClassRepository(db)
-    return await repo.list_schedules(class_id)
+    uc = ListSchedulesUseCase(SQLClassRepository(db))
+    return await uc.execute(class_id, token.org_id)
 
 
 @router.delete("/{class_id}/schedules/{schedule_id}", status_code=204)
@@ -107,8 +109,8 @@ async def list_enrollments(
     token=Depends(_teacher),
     db: AsyncSession = Depends(get_db),
 ):
-    repo = SQLClassRepository(db)
-    return await repo.list_enrollments(class_id)
+    uc = ListEnrollmentsUseCase(SQLClassRepository(db))
+    return await uc.execute(class_id, token.org_id)
 
 
 @router.delete("/{class_id}/enrollments/{student_id}", status_code=204)
