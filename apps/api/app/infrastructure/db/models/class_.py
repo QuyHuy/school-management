@@ -44,8 +44,8 @@ class ClassScheduleModel(Base):
         PGUUID(as_uuid=True), ForeignKey("classes.id"), nullable=False, index=True
     )
     day_of_week: Mapped[int] = mapped_column(SmallInteger, nullable=False)  # 0=Mon … 6=Sun
-    start_time: Mapped[time] = mapped_column(Time(timezone=True), nullable=False)
-    end_time: Mapped[time] = mapped_column(Time(timezone=True), nullable=False)
+    start_time: Mapped[time] = mapped_column(Time(timezone=False), nullable=False)
+    end_time: Mapped[time] = mapped_column(Time(timezone=False), nullable=False)
 
 
 class EnrollmentModel(Base):

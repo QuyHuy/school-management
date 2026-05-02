@@ -16,6 +16,7 @@ module.exports = {
         surface: "#f7f7f7",
         canvas: "#ffffff",
         error: "#c13515",
+        success: "#008a05",
         // shadcn/ui compatible aliases
         background: "#ffffff",
         foreground: "#222222",
