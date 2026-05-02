@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { deleteScheduleApi } from "../api/classes.api";
 import type { ClassSchedule } from "../model/types";
 
@@ -12,9 +13,17 @@ interface Props {
 }
 
 export function ScheduleList({ classId, schedules, onDeleted }: Props) {
+  const [error, setError] = useState<string | null>(null);
+
   async function handleDelete(scheduleId: string) {
-    await deleteScheduleApi(classId, scheduleId);
-    onDeleted(scheduleId);
+    if (!window.confirm("Xoá lịch học này?")) return;
+    setError(null);
+    try {
+      await deleteScheduleApi(classId, scheduleId);
+      onDeleted(scheduleId);
+    } catch {
+      setError("Không thể xoá lịch học. Vui lòng thử lại.");
+    }
   }
 
   if (schedules.length === 0) {
@@ -22,23 +31,26 @@ export function ScheduleList({ classId, schedules, onDeleted }: Props) {
   }
 
   return (
-    <ul className="flex flex-col gap-2">
-      {schedules.map((s) => (
-        <li
-          key={s.id}
-          className="flex items-center justify-between rounded border border-border px-4 py-2 text-sm"
-        >
-          <span className="text-ink">
-            {DAYS[s.day_of_week]} · {s.start_time.slice(0, 5)} – {s.end_time.slice(0, 5)}
-          </span>
-          <button
-            onClick={() => handleDelete(s.id)}
-            className="text-xs text-error hover:underline"
+    <div>
+      {error && <p className="text-xs text-error mb-2">{error}</p>}
+      <ul className="flex flex-col gap-2">
+        {schedules.map((s) => (
+          <li
+            key={s.id}
+            className="flex items-center justify-between rounded border border-border px-4 py-2 text-sm"
           >
-            Xoá
-          </button>
-        </li>
-      ))}
-    </ul>
+            <span className="text-ink">
+              {DAYS[s.day_of_week]} · {s.start_time.slice(0, 5)} – {s.end_time.slice(0, 5)}
+            </span>
+            <button
+              onClick={() => handleDelete(s.id)}
+              className="text-xs text-error hover:underline"
+            >
+              Xoá
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

@@ -29,6 +29,7 @@ export function AddScheduleForm({ classId, onAdded }: Props) {
         end_time: `${endTime}:00`,
       });
       onAdded(schedule);
+      setDayOfWeek(0);
       setStartTime("08:00");
       setEndTime("10:00");
     } catch {
@@ -73,7 +74,7 @@ export function AddScheduleForm({ classId, onAdded }: Props) {
         disabled={loading}
         className="rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover transition-colors disabled:opacity-50"
       >
-        {loading ? "..." : "+ Thêm lịch"}
+        {loading ? "Đang thêm..." : "+ Thêm lịch"}
       </button>
       {error && <p className="text-xs text-error w-full">{error}</p>}
     </form>

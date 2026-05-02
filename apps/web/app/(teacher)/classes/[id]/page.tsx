@@ -14,14 +14,17 @@ export default function ClassDetailPage() {
   const [class_, setClass_] = useState<Class | null>(null);
   const [schedules, setSchedules] = useState<ClassSchedule[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([getClassApi(id), listSchedulesApi(id)])
       .then(([c, s]) => { setClass_(c); setSchedules(s); })
+      .catch(() => setError("Không thể tải thông tin lớp."))
       .finally(() => setLoading(false));
   }, [id]);
 
   if (loading) return <p className="text-ash text-sm">Đang tải...</p>;
+  if (error) return <p className="text-error text-sm">{error}</p>;
   if (!class_) return <p className="text-error text-sm">Không tìm thấy lớp.</p>;
 
   return (
