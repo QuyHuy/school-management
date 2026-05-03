@@ -31,3 +31,9 @@ def test_orm_models_importable():
     from app.infrastructure.db.models.attendance import AttendanceRecordModel, ClassSessionModel
     assert ClassSessionModel.__tablename__ == "class_sessions"
     assert AttendanceRecordModel.__tablename__ == "attendance_records"
+
+
+def test_sql_repo_is_subclass_of_abc():
+    from app.domain.repositories.attendance_repository import IAttendanceRepository
+    from app.infrastructure.db.repositories.attendance_repository import SQLAttendanceRepository
+    assert issubclass(SQLAttendanceRepository, IAttendanceRepository)
