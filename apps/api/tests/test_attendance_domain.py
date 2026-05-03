@@ -25,3 +25,9 @@ def test_attendance_record_status():
         marked_at=datetime.now(timezone.utc),
     )
     assert r.status == "present"
+
+
+def test_orm_models_importable():
+    from app.infrastructure.db.models.attendance import AttendanceRecordModel, ClassSessionModel
+    assert ClassSessionModel.__tablename__ == "class_sessions"
+    assert AttendanceRecordModel.__tablename__ == "attendance_records"
