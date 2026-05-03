@@ -3,22 +3,24 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { getClassApi, listSchedulesApi } from "@/src/features/classes/api/classes.api";
+import { getClassApi, listSchedulesApi, listEnrollmentsApi } from "@/src/features/classes/api/classes.api";
 import { ScheduleList } from "@/src/features/classes/ui/ScheduleList";
 import { AddScheduleForm } from "@/src/features/classes/ui/AddScheduleForm";
 import { EnrollmentSection } from "@/src/features/classes/ui/EnrollmentSection";
-import type { Class, ClassSchedule } from "@/src/features/classes/model/types";
+import { SessionSection } from "@/src/features/attendance/ui/SessionSection";
+import type { Class, ClassSchedule, Enrollment } from "@/src/features/classes/model/types";
 
 export default function ClassDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [class_, setClass_] = useState<Class | null>(null);
   const [schedules, setSchedules] = useState<ClassSchedule[]>([]);
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([getClassApi(id), listSchedulesApi(id)])
-      .then(([c, s]) => { setClass_(c); setSchedules(s); })
+    Promise.all([getClassApi(id), listSchedulesApi(id), listEnrollmentsApi(id)])
+      .then(([c, s, e]) => { setClass_(c); setSchedules(s); setEnrollments(e); })
       .catch(() => setError("Không thể tải thông tin lớp."))
       .finally(() => setLoading(false));
   }, [id]);
@@ -88,6 +90,12 @@ export default function ClassDetailPage() {
       {/* Students */}
       <section className="rounded-md border border-border bg-canvas p-5">
         <EnrollmentSection classId={id} />
+      </section>
+
+      {/* Attendance */}
+      <section className="rounded-md border border-border bg-canvas p-5">
+        <h2 className="font-semibold text-ink mb-4">Điểm danh</h2>
+        <SessionSection classId={id} enrollments={enrollments} />
       </section>
     </div>
   );
