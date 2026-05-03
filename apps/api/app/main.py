@@ -83,3 +83,7 @@ from app.interfaces.api.v1.routers import classes, students  # noqa: E402
 
 app.include_router(students.router, prefix="/api/v1/students", tags=["students"])
 app.include_router(classes.router, prefix="/api/v1/classes", tags=["classes"])
+
+from app.interfaces.api.v1.routers import attendance  # noqa: E402
+
+app.include_router(attendance.router, prefix="/api/v1/classes", tags=["attendance"])
