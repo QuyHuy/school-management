@@ -86,6 +86,17 @@ export default function StudentDetailPage() {
             <p className="text-xs font-semibold text-ash uppercase tracking-wide mb-1">Số lớp</p>
             <p className="text-sm font-medium text-ink">{classes.length} lớp</p>
           </div>
+          <div className="rounded-sm bg-surface px-4 py-3">
+            <p className="text-xs font-semibold text-ash uppercase tracking-wide mb-1">Tài khoản phụ huynh</p>
+            {student.parent_id ? (
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-success">
+                <span className="w-1.5 h-1.5 rounded-full bg-success inline-block" />
+                Đã có tài khoản
+              </span>
+            ) : (
+              <span className="text-xs text-ash">Chưa có</span>
+            )}
+          </div>
           {student.note && (
             <div className="col-span-2 rounded-sm bg-surface px-4 py-3">
               <p className="text-xs font-semibold text-ash uppercase tracking-wide mb-1">Ghi chú</p>
