@@ -36,3 +36,6 @@ class IClassRepository(ABC):
 
     @abstractmethod
     async def unenroll(self, class_id: UUID, student_id: UUID) -> None: ...
+
+    @abstractmethod
+    async def list_by_student(self, student_id: UUID, org_id: UUID) -> list[Class]: ...

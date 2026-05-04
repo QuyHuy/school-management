@@ -150,3 +150,16 @@ class SQLClassRepository(IClassRepository):
                 EnrollmentModel.student_id == student_id,
             )
         )
+
+    async def list_by_student(self, student_id: UUID, org_id: UUID) -> list[Class]:
+        result = await self._session.execute(
+            select(ClassModel)
+            .join(EnrollmentModel, EnrollmentModel.class_id == ClassModel.id)
+            .where(
+                EnrollmentModel.student_id == student_id,
+                ClassModel.organization_id == org_id,
+                ClassModel.deleted_at.is_(None),
+            )
+            .order_by(ClassModel.name)
+        )
+        return [_class_to_domain(r) for r in result.scalars()]

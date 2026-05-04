@@ -91,3 +91,27 @@ async def test_get_student(client: AsyncClient):
         assert resp.json()["name"] == "Nguyễn Văn A"
     finally:
         app.dependency_overrides.pop(get_current_user, None)
+
+
+async def test_list_student_classes(client: AsyncClient):
+    import datetime as _dt
+    from app.domain.entities.class_ import Class
+    _CLASS_ID = uuid.UUID("00000000-0000-0000-0000-000000000010")
+    _class = Class(
+        id=_CLASS_ID, organization_id=_ORG_ID, teacher_id=_TEACHER_ID,
+        name="Toán 10A", subject="Toán", academic_year="2025-2026",
+        is_active=True, created_at=_NOW, updated_at=_NOW, deleted_at=None,
+    )
+    app.dependency_overrides[get_current_user] = _override
+    try:
+        with patch("app.interfaces.api.v1.routers.students.ListStudentClassesUseCase") as MockUC:
+            MockUC.return_value.execute = AsyncMock(return_value=[_class])
+            resp = await client.get(
+                f"/api/v1/students/{_STUDENT_ID}/classes",
+                headers={"Authorization": "Bearer fake"},
+            )
+        assert resp.status_code == 200
+        assert len(resp.json()) == 1
+        assert resp.json()[0]["name"] == "Toán 10A"
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
