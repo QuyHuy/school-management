@@ -2,3 +2,4 @@ from app.infrastructure.db.models.user import OrganizationModel, UserModel  # no
 from app.infrastructure.db.models.student import StudentModel  # noqa: F401
 from app.infrastructure.db.models.class_ import ClassModel, ClassScheduleModel, EnrollmentModel  # noqa: F401
 from app.infrastructure.db.models.attendance import ClassSessionModel, AttendanceRecordModel  # noqa: F401
+from app.infrastructure.db.models.exam import ExamModel, GradeModel  # noqa: F401
