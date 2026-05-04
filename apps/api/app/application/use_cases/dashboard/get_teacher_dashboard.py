@@ -16,7 +16,8 @@ class GetTeacherDashboardUseCase:
         self._session = session
 
     async def execute(self, teacher_id: UUID, org_id: UUID) -> DashboardSummary:
-        # 1. Active classes taught by this teacher
+        today = date.today()
+
         classes_q = await self._session.execute(
             select(ClassModel).where(
                 ClassModel.teacher_id == teacher_id,
@@ -29,7 +30,6 @@ class GetTeacherDashboardUseCase:
         class_ids = [c.id for c in active_classes]
         class_meta: dict[UUID, tuple[str, str]] = {c.id: (c.name, c.subject) for c in active_classes}
 
-        # 2. Unique enrolled students
         if class_ids:
             count_q = await self._session.execute(
                 select(func.count(func.distinct(EnrollmentModel.student_id))).where(
@@ -40,13 +40,11 @@ class GetTeacherDashboardUseCase:
         else:
             total_students = 0
 
-        # 3. Today's schedule (matches weekday 0=Mon…6=Sun)
         if class_ids:
-            today_dow = date.today().weekday()
             sched_q = await self._session.execute(
                 select(ClassScheduleModel).where(
                     ClassScheduleModel.class_id.in_(class_ids),
-                    ClassScheduleModel.day_of_week == today_dow,
+                    ClassScheduleModel.day_of_week == today.weekday(),
                 ).order_by(ClassScheduleModel.start_time)
             )
             today_schedule = [
@@ -62,13 +60,13 @@ class GetTeacherDashboardUseCase:
         else:
             today_schedule = []
 
-        # 4. Sessions in last 7 days with no attendance records yet
         if class_ids:
-            seven_days_ago = date.today() - timedelta(days=7)
+            seven_days_ago = today - timedelta(days=7)
             pending_q = await self._session.execute(
                 select(ClassSessionModel).where(
                     ClassSessionModel.class_id.in_(class_ids),
                     ClassSessionModel.date >= seven_days_ago,
+                    ClassSessionModel.date < today,
                     ~select(AttendanceRecordModel.id)
                     .where(AttendanceRecordModel.session_id == ClassSessionModel.id)
                     .correlate(ClassSessionModel)

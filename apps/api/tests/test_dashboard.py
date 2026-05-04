@@ -60,6 +60,7 @@ async def test_get_dashboard(client: AsyncClient):
         assert len(body["today_schedule"]) == 1
         assert body["today_schedule"][0]["class_name"] == "Toán 10A"
         assert len(body["pending_sessions"]) == 1
+        assert body["pending_sessions"][0]["class_name"] == "Toán 10A"
     finally:
         app.dependency_overrides.pop(get_current_user, None)
 
