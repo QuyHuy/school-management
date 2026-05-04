@@ -3,12 +3,13 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.application.use_cases.students.create_student import CreateStudentUseCase
+from app.application.use_cases.students.create_student import CreateStudentUseCase, ParentInput
 from app.application.use_cases.students.get_student import GetStudentUseCase
 from app.application.use_cases.students.list_student_classes import ListStudentClassesUseCase
 from app.application.use_cases.students.list_students import ListStudentsUseCase
 from app.infrastructure.db.repositories.class_repository import SQLClassRepository
 from app.infrastructure.db.repositories.student_repository import SQLStudentRepository
+from app.infrastructure.db.repositories.user_repository import SQLUserRepository
 from app.infrastructure.db.session import get_db
 from app.interfaces.api.v1.dependencies import require_role
 from app.interfaces.api.v1.schemas.class_ import ClassResponse
@@ -24,8 +25,16 @@ async def create_student(
     token=Depends(_teacher_or_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    uc = CreateStudentUseCase(SQLStudentRepository(db))
-    return await uc.execute(token.org_id, body.name, body.date_of_birth, body.note)
+    parent_input: ParentInput | None = None
+    if body.parent:
+        parent_input = ParentInput(
+            name=body.parent.name,
+            email=body.parent.email,
+            phone=body.parent.phone,
+            password=body.parent.password,
+        )
+    uc = CreateStudentUseCase(SQLStudentRepository(db), SQLUserRepository(db))
+    return await uc.execute(token.org_id, body.name, body.date_of_birth, body.note, parent_input)
 
 
 @router.get("", response_model=list[StudentResponse])

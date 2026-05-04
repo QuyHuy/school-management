@@ -17,6 +17,7 @@ def _to_domain(row: StudentModel) -> Student:
         name=row.name,
         date_of_birth=row.date_of_birth,
         note=row.note,
+        parent_id=row.parent_id,
         created_at=row.created_at,
         updated_at=row.updated_at,
         deleted_at=row.deleted_at,
@@ -34,6 +35,7 @@ class SQLStudentRepository(IStudentRepository):
             name=student.name,
             date_of_birth=student.date_of_birth,
             note=student.note,
+            parent_id=student.parent_id,
         )
         self._session.add(row)
         await self._session.flush()

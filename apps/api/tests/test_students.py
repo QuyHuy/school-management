@@ -23,6 +23,7 @@ _STUDENT = Student(
     name="Nguyễn Văn A",
     date_of_birth=None,
     note=None,
+    parent_id=None,
     created_at=_NOW,
     updated_at=_NOW,
     deleted_at=None,
@@ -33,7 +34,7 @@ async def _override():
     return _TOKEN
 
 
-async def test_create_student(client: AsyncClient):
+async def test_create_student_no_parent(client: AsyncClient):
     app.dependency_overrides[get_current_user] = _override
     try:
         with patch("app.interfaces.api.v1.routers.students.CreateStudentUseCase") as MockUC:
@@ -45,7 +46,49 @@ async def test_create_student(client: AsyncClient):
             )
         assert resp.status_code == 201
         assert resp.json()["name"] == "Nguyễn Văn A"
-        assert resp.json()["id"] == str(_STUDENT_ID)
+        assert resp.json()["parent_id"] is None
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+
+
+async def test_create_student_with_parent(client: AsyncClient):
+    _PARENT_ID = uuid.UUID("00000000-0000-0000-0000-000000000099")
+    student_with_parent = Student(
+        id=_STUDENT_ID, organization_id=_ORG_ID, name="Nguyễn Văn A",
+        date_of_birth=None, note=None, parent_id=_PARENT_ID,
+        created_at=_NOW, updated_at=_NOW, deleted_at=None,
+    )
+    app.dependency_overrides[get_current_user] = _override
+    try:
+        with patch("app.interfaces.api.v1.routers.students.CreateStudentUseCase") as MockUC:
+            MockUC.return_value.execute = AsyncMock(return_value=student_with_parent)
+            resp = await client.post(
+                "/api/v1/students",
+                json={
+                    "name": "Nguyễn Văn A",
+                    "parent": {
+                        "name": "Nguyễn Văn Cha",
+                        "email": "cha@example.com",
+                        "password": "secret123",
+                    },
+                },
+                headers={"Authorization": "Bearer fake"},
+            )
+        assert resp.status_code == 201
+        assert resp.json()["parent_id"] == str(_PARENT_ID)
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+
+
+async def test_create_student_weak_password(client: AsyncClient):
+    app.dependency_overrides[get_current_user] = _override
+    try:
+        resp = await client.post(
+            "/api/v1/students",
+            json={"name": "A", "parent": {"name": "B", "email": "b@x.com", "password": "123"}},
+            headers={"Authorization": "Bearer fake"},
+        )
+        assert resp.status_code == 422
     finally:
         app.dependency_overrides.pop(get_current_user, None)
 

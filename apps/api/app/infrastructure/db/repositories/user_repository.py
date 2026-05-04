@@ -43,3 +43,19 @@ class SQLUserRepository(IUserRepository):
         )
         row = result.scalar_one_or_none()
         return _to_domain(row) if row else None
+
+    async def create(self, user: User) -> User:
+        row = UserModel(
+            id=user.id,
+            organization_id=user.organization_id,
+            email=user.email,
+            password_hash=user.password_hash,
+            role=user.role.value,
+            name=user.name,
+            phone=user.phone,
+            is_active=user.is_active,
+        )
+        self._session.add(row)
+        await self._session.flush()
+        await self._session.refresh(row)
+        return _to_domain(row)

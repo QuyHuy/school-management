@@ -12,6 +12,7 @@ class Student:
     name: str
     date_of_birth: date | None
     note: str | None
+    parent_id: UUID | None   # FK to users (role=parent)
     created_at: datetime
     updated_at: datetime
     deleted_at: datetime | None
