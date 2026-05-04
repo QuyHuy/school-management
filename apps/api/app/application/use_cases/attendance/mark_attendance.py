@@ -29,9 +29,8 @@ class MarkAttendanceUseCase:
         if not session:
             raise NotFoundError("ClassSession", str(session_id))
         now = datetime.now(timezone.utc)
-        results = []
-        for r in records:
-            record = AttendanceRecord(
+        att_records = [
+            AttendanceRecord(
                 id=uuid.uuid4(),
                 session_id=session_id,
                 student_id=r["student_id"],
@@ -39,6 +38,6 @@ class MarkAttendanceUseCase:
                 note=r.get("note"),
                 marked_at=now,
             )
-            saved = await self._att_repo.upsert_attendance(record)
-            results.append(saved)
-        return results
+            for r in records
+        ]
+        return await self._att_repo.bulk_upsert_attendance(att_records)

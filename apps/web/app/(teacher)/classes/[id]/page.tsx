@@ -9,18 +9,21 @@ import { AddScheduleForm } from "@/src/features/classes/ui/AddScheduleForm";
 import { EnrollmentSection } from "@/src/features/classes/ui/EnrollmentSection";
 import { SessionSection } from "@/src/features/attendance/ui/SessionSection";
 import type { Class, ClassSchedule, Enrollment } from "@/src/features/classes/model/types";
+import { listStudentsApi } from "@/src/features/students/api/students.api";
+import type { Student } from "@/src/features/students/model/types";
 
 export default function ClassDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [class_, setClass_] = useState<Class | null>(null);
   const [schedules, setSchedules] = useState<ClassSchedule[]>([]);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([getClassApi(id), listSchedulesApi(id), listEnrollmentsApi(id)])
-      .then(([c, s, e]) => { setClass_(c); setSchedules(s); setEnrollments(e); })
+    Promise.all([getClassApi(id), listSchedulesApi(id), listEnrollmentsApi(id), listStudentsApi()])
+      .then(([c, s, e, st]) => { setClass_(c); setSchedules(s); setEnrollments(e); setStudents(st); })
       .catch(() => setError("Không thể tải thông tin lớp."))
       .finally(() => setLoading(false));
   }, [id]);
@@ -95,7 +98,7 @@ export default function ClassDetailPage() {
       {/* Attendance */}
       <section className="rounded-md border border-border bg-canvas p-5">
         <h2 className="font-semibold text-ink mb-4">Điểm danh</h2>
-        <SessionSection classId={id} enrollments={enrollments} />
+        <SessionSection classId={id} enrollments={enrollments} students={students} />
       </section>
     </div>
   );

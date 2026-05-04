@@ -90,7 +90,7 @@ async def test_mark_attendance_success():
     class_repo.get_by_id.return_value = _CLASS
     att_repo = AsyncMock()
     att_repo.get_session.return_value = _SESSION
-    att_repo.upsert_attendance.return_value = _RECORD
+    att_repo.bulk_upsert_attendance.return_value = [_RECORD]
     results = await MarkAttendanceUseCase(class_repo, att_repo).execute(
         _CLASS_ID, _SESSION_ID, _ORG_ID,
         [{"student_id": _STUDENT_ID, "status": "present", "note": None}],

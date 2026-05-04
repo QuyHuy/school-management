@@ -97,6 +97,31 @@ class SQLAttendanceRepository(IAttendanceRepository):
         row = result.scalar_one()
         return _record_to_domain(row)
 
+    async def bulk_upsert_attendance(self, records: list[AttendanceRecord]) -> list[AttendanceRecord]:
+        if not records:
+            return []
+        stmt = pg_insert(AttendanceRecordModel).values([
+            {
+                "id": r.id,
+                "session_id": r.session_id,
+                "student_id": r.student_id,
+                "status": r.status,
+                "note": r.note,
+                "marked_at": r.marked_at,
+            }
+            for r in records
+        ])
+        stmt = stmt.on_conflict_do_update(
+            constraint="uq_attendance_record",
+            set_={
+                "status": stmt.excluded.status,
+                "note": stmt.excluded.note,
+                "marked_at": stmt.excluded.marked_at,
+            },
+        ).returning(AttendanceRecordModel)
+        result = await self._session.execute(stmt)
+        return [_record_to_domain(row) for row in result.scalars()]
+
     async def list_attendance(self, session_id: UUID) -> list[AttendanceRecord]:
         result = await self._session.execute(
             select(AttendanceRecordModel)
