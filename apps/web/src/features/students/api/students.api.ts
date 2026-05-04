@@ -15,3 +15,8 @@ export async function getStudentApi(id: string): Promise<Student> {
   const { data } = await apiClient.get<Student>(`/students/${id}`);
   return data;
 }
+
+export async function listStudentClassesApi(studentId: string): Promise<import("@/src/features/classes/model/types").Class[]> {
+  const { data } = await apiClient.get(`/students/${studentId}/classes`);
+  return data;
+}

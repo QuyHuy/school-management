@@ -8,6 +8,7 @@ import { useAuthStore } from "@/src/features/auth/model/store";
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: "⊞" },
   { href: "/classes", label: "Lớp học", icon: "📚" },
+  { href: "/students", label: "Học sinh", icon: "👤" },
 ];
 
 export default function TeacherLayout({ children }: { children: React.ReactNode }) {
