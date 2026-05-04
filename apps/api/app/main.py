@@ -91,3 +91,7 @@ app.include_router(attendance.router, prefix="/api/v1/classes", tags=["attendanc
 from app.interfaces.api.v1.routers import exams  # noqa: E402
 
 app.include_router(exams.router, prefix="/api/v1/classes", tags=["exams"])
+
+from app.interfaces.api.v1.routers import dashboard  # noqa: E402
+
+app.include_router(dashboard.router, prefix="/api/v1", tags=["dashboard"])
