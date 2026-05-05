@@ -1,3 +1,9 @@
+export interface ParentInfo {
+  name: string;
+  email: string;
+  phone: string | null;
+}
+
 export interface Student {
   id: string;
   organization_id: string;
@@ -5,6 +11,7 @@ export interface Student {
   date_of_birth: string | null;
   note: string | null;
   parent_id: string | null;
+  parent: ParentInfo | null;
   created_at: string;
 }
 

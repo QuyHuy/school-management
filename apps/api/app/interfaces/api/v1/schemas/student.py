@@ -34,6 +34,14 @@ class CreateStudentRequest(BaseModel):
     parent: ParentRequest | None = None
 
 
+class ParentInfo(BaseModel):
+    name: str
+    email: str
+    phone: str | None
+
+    model_config = {"from_attributes": True}
+
+
 class StudentResponse(BaseModel):
     id: UUID
     organization_id: UUID
@@ -41,6 +49,7 @@ class StudentResponse(BaseModel):
     date_of_birth: date | None
     note: str | None
     parent_id: UUID | None
+    parent: ParentInfo | None = None
     created_at: datetime
 
     model_config = {"from_attributes": True}

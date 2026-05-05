@@ -13,7 +13,7 @@ from app.infrastructure.db.repositories.user_repository import SQLUserRepository
 from app.infrastructure.db.session import get_db
 from app.interfaces.api.v1.dependencies import require_role
 from app.interfaces.api.v1.schemas.class_ import ClassResponse
-from app.interfaces.api.v1.schemas.student import CreateStudentRequest, StudentResponse
+from app.interfaces.api.v1.schemas.student import CreateStudentRequest, ParentInfo, StudentResponse
 
 router = APIRouter()
 _teacher_or_admin = require_role("teacher", "admin")
@@ -52,8 +52,22 @@ async def get_student(
     token=Depends(_teacher_or_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    uc = GetStudentUseCase(SQLStudentRepository(db))
-    return await uc.execute(student_id, token.org_id)
+    student = await GetStudentUseCase(SQLStudentRepository(db)).execute(student_id, token.org_id)
+    parent: ParentInfo | None = None
+    if student.parent_id:
+        user = await SQLUserRepository(db).get_by_id(student.parent_id)
+        if user:
+            parent = ParentInfo(name=user.name, email=user.email, phone=user.phone)
+    return StudentResponse(
+        id=student.id,
+        organization_id=student.organization_id,
+        name=student.name,
+        date_of_birth=student.date_of_birth,
+        note=student.note,
+        parent_id=student.parent_id,
+        parent=parent,
+        created_at=student.created_at,
+    )
 
 
 @router.get("/{student_id}/classes", response_model=list[ClassResponse])

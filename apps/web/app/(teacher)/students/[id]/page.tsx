@@ -86,17 +86,6 @@ export default function StudentDetailPage() {
             <p className="text-xs font-semibold text-ash uppercase tracking-wide mb-1">Số lớp</p>
             <p className="text-sm font-medium text-ink">{classes.length} lớp</p>
           </div>
-          <div className="rounded-sm bg-surface px-4 py-3">
-            <p className="text-xs font-semibold text-ash uppercase tracking-wide mb-1">Tài khoản phụ huynh</p>
-            {student.parent_id ? (
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-success">
-                <span className="w-1.5 h-1.5 rounded-full bg-success inline-block" />
-                Đã có tài khoản
-              </span>
-            ) : (
-              <span className="text-xs text-ash">Chưa có</span>
-            )}
-          </div>
           {student.note && (
             <div className="col-span-2 rounded-sm bg-surface px-4 py-3">
               <p className="text-xs font-semibold text-ash uppercase tracking-wide mb-1">Ghi chú</p>
@@ -104,6 +93,29 @@ export default function StudentDetailPage() {
             </div>
           )}
         </div>
+      </section>
+
+      {/* Parent info */}
+      <section className="rounded-md border border-border bg-canvas p-5">
+        <h2 className="font-semibold text-ink mb-4">Thông tin phụ huynh</h2>
+        {student.parent ? (
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-sm bg-surface px-4 py-3">
+              <p className="text-xs font-semibold text-ash uppercase tracking-wide mb-1">Họ tên</p>
+              <p className="text-sm font-medium text-ink">{student.parent.name}</p>
+            </div>
+            <div className="rounded-sm bg-surface px-4 py-3">
+              <p className="text-xs font-semibold text-ash uppercase tracking-wide mb-1">Số điện thoại</p>
+              <p className="text-sm font-medium text-ink">{student.parent.phone ?? "—"}</p>
+            </div>
+            <div className="col-span-2 rounded-sm bg-surface px-4 py-3">
+              <p className="text-xs font-semibold text-ash uppercase tracking-wide mb-1">Email đăng nhập</p>
+              <p className="text-sm font-medium text-ink">{student.parent.email}</p>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-ash">Chưa có tài khoản phụ huynh.</p>
+        )}
       </section>
 
       {/* Enrolled classes */}
