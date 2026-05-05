@@ -4,7 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "../model/store";
 
-export function LoginForm() {
+interface Props {
+  redirectTo?: string;
+  expectedRole?: "teacher" | "admin" | "parent";
+}
+
+export function LoginForm({ redirectTo = "/dashboard", expectedRole }: Props) {
   const login = useAuthStore((s) => s.login);
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -18,7 +23,13 @@ export function LoginForm() {
     setLoading(true);
     try {
       await login(email, password);
-      router.push("/dashboard");
+      const user = useAuthStore.getState().user;
+      if (expectedRole && user?.role !== expectedRole) {
+        await useAuthStore.getState().logout();
+        setError("Tài khoản này không có quyền truy cập trang này.");
+        return;
+      }
+      router.push(redirectTo);
     } catch {
       setError("Email hoặc mật khẩu không đúng.");
     } finally {
@@ -40,7 +51,7 @@ export function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="rounded-sm border border-border px-4 py-3 text-sm text-ink placeholder-ash focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink"
-          placeholder="giaovien@truong.com"
+          placeholder="phuhuynh@email.com"
         />
       </div>
 
