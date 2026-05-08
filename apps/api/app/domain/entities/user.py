@@ -16,6 +16,10 @@ class UserRole(str, Enum):
 class Organization:
     id: UUID
     name: str
+    phone: str | None
+    address: str | None
+    academic_year: str | None
+    logo_url: str | None
     zalo_oa_id: str | None
     zalo_oa_token_encrypted: str | None
     created_at: datetime

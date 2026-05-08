@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, DateTime, Enum as SAEnum, ForeignKey, String
+from sqlalchemy import Boolean, DateTime, Enum as SAEnum, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -19,6 +19,10 @@ class OrganizationModel(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
+    phone: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    address: Mapped[str | None] = mapped_column(Text, nullable=True)
+    academic_year: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    logo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     zalo_oa_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     zalo_oa_token_encrypted: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
