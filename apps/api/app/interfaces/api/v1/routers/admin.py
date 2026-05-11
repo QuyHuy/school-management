@@ -32,6 +32,7 @@ from app.interfaces.api.v1.schemas.admin import (
     TeacherClassInfoSchema,
     TeacherDetailSchema,
     TeacherInfoSchema,
+    UpdateSettingsRequest,
     UpdateTeacherRequest,
 )
 
@@ -199,7 +200,7 @@ async def get_settings(token=Depends(_admin), db: AsyncSession = Depends(get_db)
 
 @router.patch("/settings", response_model=OrgSettingsSchema)
 async def update_settings(
-    body: OrgSettingsSchema,
+    body: UpdateSettingsRequest,
     token=Depends(_admin),
     db: AsyncSession = Depends(get_db),
 ):

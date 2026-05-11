@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class TeacherClassInfoSchema(BaseModel):
@@ -90,7 +90,7 @@ class GradeReportResponse(BaseModel):
 class CreateTeacherRequest(BaseModel):
     name: str
     email: EmailStr
-    password: str
+    password: str = Field(min_length=8)
     phone: str | None = None
 
 
@@ -101,4 +101,14 @@ class UpdateTeacherRequest(BaseModel):
 
 
 class ResetPasswordRequest(BaseModel):
-    new_password: str
+    new_password: str = Field(min_length=8)
+
+
+class UpdateSettingsRequest(BaseModel):
+    name: str | None = None
+    phone: str | None = None
+    address: str | None = None
+    academic_year: str | None = None
+    logo_url: str | None = None
+    zalo_oa_id: str | None = None
+    zalo_oa_token: str | None = None
