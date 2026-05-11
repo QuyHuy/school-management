@@ -22,7 +22,7 @@ _NOW = datetime(2026, 5, 1, tzinfo=timezone.utc)
 _CLASS = Class(
     id=_CLASS_ID, organization_id=_ORG_ID, teacher_id=uuid.uuid4(),
     name="Toán 10A", subject="Toán", academic_year="2025-2026",
-    is_active=True, created_at=_NOW, updated_at=_NOW, deleted_at=None,
+    grade=None, is_active=True, created_at=_NOW, updated_at=_NOW, deleted_at=None,
 )
 _SESSION = ClassSession(
     id=_SESSION_ID, class_id=_CLASS_ID,

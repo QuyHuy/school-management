@@ -10,11 +10,11 @@ import type { AttendanceRecord, ClassSession } from "../model/types";
 import { AttendanceSheet } from "./AttendanceSheet";
 import type { Enrollment } from "@/src/features/classes/model/types";
 import type { Student } from "@/src/features/students/model/types";
-import { listStudentsApi } from "@/src/features/students/api/students.api";
 
 interface Props {
   classId: string;
   enrollments: Enrollment[];
+  students: Student[];
 }
 
 const DAY_LABELS = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
@@ -24,9 +24,8 @@ function formatDate(iso: string) {
   return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()} (${DAY_LABELS[d.getDay() === 0 ? 6 : d.getDay() - 1]})`;
 }
 
-export function SessionSection({ classId, enrollments }: Props) {
+export function SessionSection({ classId, enrollments, students }: Props) {
   const [sessions, setSessions] = useState<ClassSession[]>([]);
-  const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSession, setSelectedSession] = useState<ClassSession | null>(null);
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
@@ -36,8 +35,8 @@ export function SessionSection({ classId, enrollments }: Props) {
   const [createError, setCreateError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([listSessionsApi(classId), listStudentsApi()])
-      .then(([s, st]) => { setSessions(s); setStudents(st); })
+    listSessionsApi(classId)
+      .then(setSessions)
       .finally(() => setLoading(false));
   }, [classId]);
 

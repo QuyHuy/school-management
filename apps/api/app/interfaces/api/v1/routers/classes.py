@@ -37,7 +37,7 @@ async def create_class(
     db: AsyncSession = Depends(get_db),
 ):
     uc = CreateClassUseCase(SQLClassRepository(db))
-    return await uc.execute(token.org_id, token.user_id, body.name, body.subject, body.academic_year)
+    return await uc.execute(token.org_id, token.user_id, body.name, body.subject, body.academic_year, body.grade)
 
 
 @router.get("", response_model=list[ClassResponse])

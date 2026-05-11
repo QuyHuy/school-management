@@ -18,6 +18,7 @@ def _class_to_domain(row: ClassModel) -> Class:
         name=row.name,
         subject=row.subject,
         academic_year=row.academic_year,
+        grade=row.grade,
         is_active=row.is_active,
         created_at=row.created_at,
         updated_at=row.updated_at,
@@ -57,6 +58,7 @@ class SQLClassRepository(IClassRepository):
             name=class_.name,
             subject=class_.subject,
             academic_year=class_.academic_year,
+            grade=class_.grade,
             is_active=class_.is_active,
         )
         self._session.add(row)

@@ -7,13 +7,19 @@ from app.application.use_cases.students.create_student import CreateStudentUseCa
 from app.application.use_cases.students.get_student import GetStudentUseCase
 from app.application.use_cases.students.list_student_classes import ListStudentClassesUseCase
 from app.application.use_cases.students.list_students import ListStudentsUseCase
+from app.domain.entities.user import UserRole
 from app.infrastructure.db.repositories.class_repository import SQLClassRepository
 from app.infrastructure.db.repositories.student_repository import SQLStudentRepository
 from app.infrastructure.db.repositories.user_repository import SQLUserRepository
 from app.infrastructure.db.session import get_db
 from app.interfaces.api.v1.dependencies import require_role
 from app.interfaces.api.v1.schemas.class_ import ClassResponse
-from app.interfaces.api.v1.schemas.student import CreateStudentRequest, ParentInfo, StudentResponse
+from app.interfaces.api.v1.schemas.student import (
+    CheckParentResponse,
+    CreateStudentRequest,
+    ParentInfo,
+    StudentResponse,
+)
 
 router = APIRouter()
 _teacher_or_admin = require_role("teacher", "admin")
@@ -28,13 +34,13 @@ async def create_student(
     parent_input: ParentInput | None = None
     if body.parent:
         parent_input = ParentInput(
+            phone=body.parent.phone,
             name=body.parent.name,
             email=body.parent.email,
-            phone=body.parent.phone,
             password=body.parent.password,
         )
     uc = CreateStudentUseCase(SQLStudentRepository(db), SQLUserRepository(db))
-    return await uc.execute(token.org_id, body.name, body.date_of_birth, body.note, parent_input)
+    return await uc.execute(token.org_id, body.name, body.grade, body.date_of_birth, body.note, parent_input)
 
 
 @router.get("", response_model=list[StudentResponse])
@@ -44,6 +50,25 @@ async def list_students(
 ):
     uc = ListStudentsUseCase(SQLStudentRepository(db))
     return await uc.execute(token.org_id)
+
+
+@router.get("/check-parent", response_model=CheckParentResponse)
+async def check_parent_phone(
+    phone: str,
+    token=Depends(_teacher_or_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    user = await SQLUserRepository(db).get_by_phone(phone)
+    if not user:
+        return CheckParentResponse(exists=False)
+    is_parent = user.role == UserRole.parent
+    return CheckParentResponse(
+        exists=True,
+        is_parent=is_parent,
+        name=user.name if is_parent else None,
+        phone=user.phone if is_parent else None,
+        email=user.email if is_parent else None,
+    )
 
 
 @router.get("/{student_id}", response_model=StudentResponse)
@@ -62,6 +87,8 @@ async def get_student(
         id=student.id,
         organization_id=student.organization_id,
         name=student.name,
+        student_code=student.student_code,
+        grade=student.grade,
         date_of_birth=student.date_of_birth,
         note=student.note,
         parent_id=student.parent_id,

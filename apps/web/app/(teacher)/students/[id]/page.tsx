@@ -79,6 +79,14 @@ export default function StudentDetailPage() {
 
         <div className="mt-6 grid grid-cols-2 gap-4">
           <div className="rounded-sm bg-surface px-4 py-3">
+            <p className="text-xs font-semibold text-ash uppercase tracking-wide mb-1">Mã học sinh</p>
+            <p className="text-sm font-medium text-ink font-mono">{student.student_code ?? "—"}</p>
+          </div>
+          <div className="rounded-sm bg-surface px-4 py-3">
+            <p className="text-xs font-semibold text-ash uppercase tracking-wide mb-1">Khối</p>
+            <p className="text-sm font-medium text-ink">{student.grade ? `Khối ${student.grade}` : "—"}</p>
+          </div>
+          <div className="rounded-sm bg-surface px-4 py-3">
             <p className="text-xs font-semibold text-ash uppercase tracking-wide mb-1">Ngày sinh</p>
             <p className="text-sm font-medium text-ink">{formatDob(student.date_of_birth)}</p>
           </div>

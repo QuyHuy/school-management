@@ -8,6 +8,7 @@ import { ScheduleList } from "@/src/features/classes/ui/ScheduleList";
 import { AddScheduleForm } from "@/src/features/classes/ui/AddScheduleForm";
 import { EnrollmentSection } from "@/src/features/classes/ui/EnrollmentSection";
 import { SessionSection } from "@/src/features/attendance/ui/SessionSection";
+import { ExamSection } from "@/src/features/grades/ui/ExamSection";
 import type { Class, ClassSchedule, Enrollment } from "@/src/features/classes/model/types";
 import { listStudentsApi } from "@/src/features/students/api/students.api";
 import type { Student } from "@/src/features/students/model/types";
@@ -49,6 +50,9 @@ export default function ClassDetailPage() {
 
   if (!class_) return null;
 
+  const enrolledStudentIds = new Set(enrollments.map((e) => e.student_id));
+  const enrolledStudents = students.filter((s) => enrolledStudentIds.has(s.id));
+
   return (
     <div className="max-w-3xl flex flex-col gap-6">
       {/* Breadcrumb + Header */}
@@ -59,7 +63,10 @@ export default function ClassDetailPage() {
         <div className="flex items-start justify-between mt-3">
           <div>
             <h1 className="text-2xl font-bold text-ink tracking-tight">{class_.name}</h1>
-            <p className="text-ash text-sm mt-1">{class_.subject} · {class_.academic_year}</p>
+            <p className="text-ash text-sm mt-1">
+              {class_.subject} · {class_.academic_year}
+              {class_.grade !== null && ` · Khối ${class_.grade}`}
+            </p>
           </div>
           {class_.is_active ? (
             <span className="text-xs font-semibold text-success bg-success/10 rounded-full px-3 py-1.5 mt-1">
@@ -92,13 +99,19 @@ export default function ClassDetailPage() {
 
       {/* Students */}
       <section className="rounded-md border border-border bg-canvas p-5">
-        <EnrollmentSection classId={id} />
+        <EnrollmentSection classId={id} classGrade={class_.grade} />
       </section>
 
       {/* Attendance */}
       <section className="rounded-md border border-border bg-canvas p-5">
         <h2 className="font-semibold text-ink mb-4">Điểm danh</h2>
         <SessionSection classId={id} enrollments={enrollments} students={students} />
+      </section>
+
+      {/* Exams & Grades */}
+      <section className="rounded-md border border-border bg-canvas p-5">
+        <h2 className="font-semibold text-ink mb-4">Bài kiểm tra & Điểm số</h2>
+        <ExamSection classId={id} students={enrolledStudents} />
       </section>
     </div>
   );

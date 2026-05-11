@@ -109,11 +109,21 @@ export default function StudentsPage() {
                 </span>
               </div>
               <div>
-                <h3 className="font-semibold text-ink group-hover:text-primary transition-colors">
-                  {s.name}
-                </h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-ink group-hover:text-primary transition-colors">
+                    {s.name}
+                  </h3>
+                  {s.student_code && (
+                    <span className="text-xs font-mono text-ash bg-surface border border-border rounded px-1.5 py-0.5">
+                      {s.student_code}
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-ash mt-0.5">
-                  {s.date_of_birth ? `Ngày sinh: ${formatDob(s.date_of_birth)}` : "Chưa có ngày sinh"}
+                  {s.grade ? `Khối ${s.grade}` : ""}
+                  {s.grade && s.date_of_birth ? " · " : ""}
+                  {s.date_of_birth ? `${formatDob(s.date_of_birth)}` : ""}
+                  {!s.grade && !s.date_of_birth ? "Chưa có thông tin" : ""}
                 </p>
               </div>
             </div>

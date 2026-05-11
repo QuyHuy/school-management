@@ -15,6 +15,8 @@ def _to_domain(row: StudentModel) -> Student:
         id=row.id,
         organization_id=row.organization_id,
         name=row.name,
+        student_code=row.student_code,
+        grade=row.grade,
         date_of_birth=row.date_of_birth,
         note=row.note,
         parent_id=row.parent_id,
@@ -33,6 +35,8 @@ class SQLStudentRepository(IStudentRepository):
             id=student.id,
             organization_id=student.organization_id,
             name=student.name,
+            student_code=student.student_code,
+            grade=student.grade,
             date_of_birth=student.date_of_birth,
             note=student.note,
             parent_id=student.parent_id,
@@ -61,3 +65,19 @@ class SQLStudentRepository(IStudentRepository):
             ).order_by(StudentModel.name)
         )
         return [_to_domain(r) for r in result.scalars()]
+
+    async def get_next_student_code(self, base_code: str, org_id: UUID) -> str:
+        result = await self._session.execute(
+            select(StudentModel.student_code).where(
+                StudentModel.organization_id == org_id,
+                StudentModel.student_code.like(f"{base_code}%"),
+                StudentModel.deleted_at.is_(None),
+            )
+        )
+        existing = set(result.scalars())
+        if base_code not in existing:
+            return base_code
+        i = 1
+        while f"{base_code}{i}" in existing:
+            i += 1
+        return f"{base_code}{i}"

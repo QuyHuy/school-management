@@ -21,6 +21,8 @@ _STUDENT = Student(
     id=_STUDENT_ID,
     organization_id=_ORG_ID,
     name="Nguyễn Văn A",
+    student_code=None,
+    grade=None,
     date_of_birth=None,
     note=None,
     parent_id=None,
@@ -41,7 +43,7 @@ async def test_create_student_no_parent(client: AsyncClient):
             MockUC.return_value.execute = AsyncMock(return_value=_STUDENT)
             resp = await client.post(
                 "/api/v1/students",
-                json={"name": "Nguyễn Văn A"},
+                json={"name": "Nguyễn Văn A", "grade": 5},
                 headers={"Authorization": "Bearer fake"},
             )
         assert resp.status_code == 201
@@ -55,6 +57,7 @@ async def test_create_student_with_parent(client: AsyncClient):
     _PARENT_ID = uuid.UUID("00000000-0000-0000-0000-000000000099")
     student_with_parent = Student(
         id=_STUDENT_ID, organization_id=_ORG_ID, name="Nguyễn Văn A",
+        student_code=None, grade=None,
         date_of_birth=None, note=None, parent_id=_PARENT_ID,
         created_at=_NOW, updated_at=_NOW, deleted_at=None,
     )
@@ -66,9 +69,10 @@ async def test_create_student_with_parent(client: AsyncClient):
                 "/api/v1/students",
                 json={
                     "name": "Nguyễn Văn A",
+                    "grade": 5,
                     "parent": {
+                        "phone": "0901234567",
                         "name": "Nguyễn Văn Cha",
-                        "email": "cha@example.com",
                         "password": "secret123",
                     },
                 },
@@ -85,7 +89,7 @@ async def test_create_student_weak_password(client: AsyncClient):
     try:
         resp = await client.post(
             "/api/v1/students",
-            json={"name": "A", "parent": {"name": "B", "email": "b@x.com", "password": "123"}},
+            json={"name": "A", "grade": 1, "parent": {"phone": "0901111111", "name": "B", "password": "123"}},
             headers={"Authorization": "Bearer fake"},
         )
         assert resp.status_code == 422
@@ -143,7 +147,7 @@ async def test_list_student_classes(client: AsyncClient):
     _class = Class(
         id=_CLASS_ID, organization_id=_ORG_ID, teacher_id=_TEACHER_ID,
         name="Toán 10A", subject="Toán", academic_year="2025-2026",
-        is_active=True, created_at=_NOW, updated_at=_NOW, deleted_at=None,
+        grade=None, is_active=True, created_at=_NOW, updated_at=_NOW, deleted_at=None,
     )
     app.dependency_overrides[get_current_user] = _override
     try:

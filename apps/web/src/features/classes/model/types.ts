@@ -5,6 +5,7 @@ export interface Class {
   name: string;
   subject: string;
   academic_year: string;
+  grade: number | null;
   is_active: boolean;
   created_at: string;
 }
@@ -29,6 +30,7 @@ export interface CreateClassRequest {
   name: string;
   subject: string;
   academic_year: string;
+  grade: number;
 }
 
 export interface AddScheduleRequest {

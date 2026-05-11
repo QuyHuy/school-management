@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { listChildrenApi, getChildGradesApi } from "@/src/features/parent/api/parent.api";
-import type { ChildGradeRow, ChildInfo } from "@/src/features/parent/model/types";
+import { getChildGradesApi } from "@/src/features/parent/api/parent.api";
+import { useParentStore } from "@/src/features/parent/model/store";
+import { ChildPicker } from "@/src/features/parent/ui/ChildPicker";
+import type { ChildGradeRow } from "@/src/features/parent/model/types";
 
 const EXAM_TYPE_LABELS: Record<string, string> = {
   quiz: "Kiểm tra nhanh",
@@ -27,25 +29,24 @@ function groupByClass(rows: ChildGradeRow[]) {
 }
 
 export default function ParentGradesPage() {
-  const [student, setStudent] = useState<ChildInfo | null>(null);
+  const { children, selectedId } = useParentStore();
   const [grades, setGrades] = useState<ChildGradeRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const selectedChild = children.find((c) => c.student_id === selectedId) ?? null;
+
   useEffect(() => {
-    listChildrenApi()
-      .then(async (children) => {
-        if (children.length === 0) return;
-        const first = children[0];
-        setStudent(first);
-        const g = await getChildGradesApi(first.student_id);
-        setGrades(g);
-      })
+    if (!selectedId) return;
+    setLoading(true);
+    setError(null);
+    getChildGradesApi(selectedId)
+      .then(setGrades)
       .catch(() => setError("Không thể tải điểm số."))
       .finally(() => setLoading(false));
-  }, []);
+  }, [selectedId]);
 
-  if (loading) {
+  if (children.length === 0) {
     return (
       <div className="p-5 flex flex-col gap-4">
         <div className="h-6 w-32 bg-stone/30 rounded animate-pulse" />
@@ -54,29 +55,32 @@ export default function ParentGradesPage() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="p-5">
-        <div className="rounded-md border border-error/20 bg-error/5 px-4 py-3 text-sm text-error">{error}</div>
-      </div>
-    );
-  }
-
-  const groups = groupByClass(grades);
-
   return (
     <div className="p-5 flex flex-col gap-5">
       <div>
         <h1 className="text-xl font-bold text-ink">Điểm số</h1>
-        {student && <p className="text-sm text-ash mt-0.5">{student.student_name}</p>}
+        {selectedChild && (
+          <p className="text-sm text-ash mt-0.5">{selectedChild.student_name}</p>
+        )}
       </div>
 
-      {groups.length === 0 ? (
+      <ChildPicker />
+
+      {loading ? (
+        <div className="flex flex-col gap-3">
+          <div className="h-10 bg-stone/20 rounded animate-pulse" />
+          <div className="h-40 bg-stone/20 rounded-md animate-pulse" />
+        </div>
+      ) : error ? (
+        <div className="rounded-md border border-error/20 bg-error/5 px-4 py-3 text-sm text-error">
+          {error}
+        </div>
+      ) : groupByClass(grades).length === 0 ? (
         <div className="rounded-md border border-border bg-canvas p-6 text-center">
           <p className="text-sm text-ash">Chưa có bài kiểm tra nào.</p>
         </div>
       ) : (
-        groups.map((group) => (
+        groupByClass(grades).map((group) => (
           <section key={group.class_name} className="rounded-md border border-border bg-canvas overflow-hidden">
             <div className="px-4 py-3 border-b border-border bg-surface">
               <p className="font-semibold text-ink text-sm">{group.class_name}</p>

@@ -13,6 +13,7 @@ class Class:
     name: str
     subject: str
     academic_year: str
+    grade: int | None
     is_active: bool
     created_at: datetime
     updated_at: datetime

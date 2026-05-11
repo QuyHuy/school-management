@@ -21,7 +21,7 @@ _NOW = datetime(2026, 1, 1, tzinfo=timezone.utc)
 _CLASS = Class(
     id=_CLASS_ID, organization_id=_ORG_ID, teacher_id=_TEACHER_ID,
     name="Toán 10A", subject="Toán", academic_year="2025-2026",
-    is_active=True, created_at=_NOW, updated_at=_NOW, deleted_at=None,
+    grade=None, is_active=True, created_at=_NOW, updated_at=_NOW, deleted_at=None,
 )
 
 _SCHEDULE = ClassSchedule(

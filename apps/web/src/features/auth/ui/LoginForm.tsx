@@ -29,7 +29,7 @@ export function LoginForm({ redirectTo = "/dashboard", expectedRole }: Props) {
         setError("Tài khoản này không có quyền truy cập trang này.");
         return;
       }
-      router.push(redirectTo);
+      router.push(redirectTo as never);
     } catch {
       setError("Email hoặc mật khẩu không đúng.");
     } finally {

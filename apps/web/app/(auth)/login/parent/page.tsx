@@ -1,4 +1,4 @@
-import { LoginForm } from "@/src/features/auth/ui/LoginForm";
+import { ParentLoginForm } from "@/src/features/auth/ui/ParentLoginForm";
 
 export default function ParentLoginPage() {
   return (
@@ -7,7 +7,7 @@ export default function ParentLoginPage() {
         Đăng nhập Phụ huynh
       </h1>
       <p className="text-sm text-ash mb-6">Dành cho phụ huynh học sinh</p>
-      <LoginForm redirectTo="/parent/home" expectedRole="parent" />
+      <ParentLoginForm redirectTo="/parent/home" />
     </div>
   );
 }

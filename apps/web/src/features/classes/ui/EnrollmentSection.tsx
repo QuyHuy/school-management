@@ -12,9 +12,10 @@ import type { Student } from "@/src/features/students/model/types";
 
 interface Props {
   classId: string;
+  classGrade: number | null;
 }
 
-export function EnrollmentSection({ classId }: Props) {
+export function EnrollmentSection({ classId, classGrade }: Props) {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [allStudents, setAllStudents] = useState<Student[]>([]);
   const [selectedStudentId, setSelectedStudentId] = useState("");
@@ -29,15 +30,19 @@ export function EnrollmentSection({ classId }: Props) {
         setEnrollments(enrs);
         setAllStudents(students);
         const enrolledIds = new Set(enrs.map((e) => e.student_id));
-        const first = students.find((s) => !enrolledIds.has(s.id));
-        if (first) setSelectedStudentId(first.id);
+        const eligible = students.filter(
+          (s) => !enrolledIds.has(s.id) && (classGrade === null || s.grade === classGrade)
+        );
+        if (eligible[0]) setSelectedStudentId(eligible[0].id);
       })
       .catch(() => setFetchError("Không thể tải danh sách học sinh."))
       .finally(() => setLoading(false));
-  }, [classId]);
+  }, [classId, classGrade]);
 
   const enrolledIds = new Set(enrollments.map((e) => e.student_id));
-  const availableStudents = allStudents.filter((s) => !enrolledIds.has(s.id));
+  const availableStudents = allStudents.filter(
+    (s) => !enrolledIds.has(s.id) && (classGrade === null || s.grade === classGrade)
+  );
 
   async function handleEnroll() {
     if (!selectedStudentId) return;
@@ -70,9 +75,16 @@ export function EnrollmentSection({ classId }: Props) {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-ink mb-3">
-        Học sinh ({enrollments.length})
-      </h2>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-lg font-semibold text-ink">
+          Học sinh ({enrollments.length})
+        </h2>
+        {classGrade !== null && (
+          <span className="text-xs text-ash bg-surface border border-border rounded-full px-2.5 py-0.5">
+            Khối {classGrade}
+          </span>
+        )}
+      </div>
 
       {loading && <p className="text-sm text-ash">Đang tải...</p>}
       {fetchError && <p className="text-sm text-error">{fetchError}</p>}
@@ -83,32 +95,42 @@ export function EnrollmentSection({ classId }: Props) {
             <p className="text-sm text-ash mb-4">Chưa có học sinh nào trong lớp.</p>
           ) : (
             <ul className="flex flex-col gap-2 mb-4">
-              {enrollments.map((e) => (
-                <li
-                  key={e.id}
-                  className="flex items-center justify-between rounded border border-border px-4 py-2 text-sm"
-                >
-                  <span className="text-ink">{studentMap[e.student_id]?.name ?? e.student_id}</span>
-                  <button
-                    onClick={() => handleUnenroll(e.student_id)}
-                    className="text-xs text-error hover:underline"
+              {enrollments.map((e) => {
+                const s = studentMap[e.student_id];
+                return (
+                  <li
+                    key={e.id}
+                    className="flex items-center justify-between rounded border border-border px-4 py-2 text-sm"
                   >
-                    Xoá khỏi lớp
-                  </button>
-                </li>
-              ))}
+                    <div>
+                      <span className="text-ink font-medium">{s?.name ?? e.student_id}</span>
+                      {s?.student_code && (
+                        <span className="ml-2 text-xs text-ash font-mono">{s.student_code}</span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => handleUnenroll(e.student_id)}
+                      className="text-xs text-error hover:underline"
+                    >
+                      Xoá khỏi lớp
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           )}
 
-          {availableStudents.length > 0 && (
+          {availableStudents.length > 0 ? (
             <div className="flex gap-3 items-center">
               <select
                 value={selectedStudentId}
                 onChange={(e) => setSelectedStudentId(e.target.value)}
-                className="flex-1 rounded-sm border border-border px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none"
+                className="flex-1 rounded-sm border border-border px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none bg-canvas"
               >
                 {availableStudents.map((s) => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
+                  <option key={s.id} value={s.id}>
+                    {s.name}{s.student_code ? ` (${s.student_code})` : ""}
+                  </option>
                 ))}
               </select>
               <button
@@ -119,6 +141,12 @@ export function EnrollmentSection({ classId }: Props) {
                 {enrolling ? "..." : "+ Thêm"}
               </button>
             </div>
+          ) : (
+            <p className="text-sm text-ash">
+              {classGrade !== null
+                ? `Không có học sinh khối ${classGrade} nào chưa vào lớp.`
+                : "Tất cả học sinh đã vào lớp."}
+            </p>
           )}
           {actionError && <p className="text-xs text-error mt-2">{actionError}</p>}
         </>

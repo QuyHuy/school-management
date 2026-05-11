@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import {
   loginApi,
+  loginParentApi,
   logoutApi,
   getMeApi,
   type MeResponse,
@@ -13,6 +14,7 @@ interface AuthState {
   refreshToken: string | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginByPhone: (phone: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   hydrate: () => Promise<void>;
 }
@@ -27,6 +29,21 @@ export const useAuthStore = create<AuthState>()(
 
       login: async (email, password) => {
         const tokens = await loginApi(email, password);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("access_token", tokens.access_token);
+          localStorage.setItem("refresh_token", tokens.refresh_token);
+        }
+        const user = await getMeApi();
+        set({
+          user,
+          accessToken: tokens.access_token,
+          refreshToken: tokens.refresh_token,
+          isAuthenticated: true,
+        });
+      },
+
+      loginByPhone: async (phone, password) => {
+        const tokens = await loginParentApi(phone, password);
         if (typeof window !== "undefined") {
           localStorage.setItem("access_token", tokens.access_token);
           localStorage.setItem("refresh_token", tokens.refresh_token);

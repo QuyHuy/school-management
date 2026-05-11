@@ -15,3 +15,6 @@ class IStudentRepository(ABC):
 
     @abstractmethod
     async def list_by_org(self, org_id: UUID) -> list[Student]: ...
+
+    @abstractmethod
+    async def get_next_student_code(self, base_code: str, org_id: UUID) -> str: ...

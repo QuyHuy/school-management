@@ -18,6 +18,7 @@ class CreateClassUseCase:
         name: str,
         subject: str,
         academic_year: str,
+        grade: int,
     ) -> Class:
         class_ = Class(
             id=uuid.uuid4(),
@@ -26,6 +27,7 @@ class CreateClassUseCase:
             name=name,
             subject=subject,
             academic_year=academic_year,
+            grade=grade,
             is_active=True,
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),

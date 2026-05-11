@@ -10,6 +10,14 @@ class CreateClassRequest(BaseModel):
     name: str
     subject: str
     academic_year: str
+    grade: int | None = None
+
+    @field_validator("grade")
+    @classmethod
+    def validate_grade(cls, v: int | None) -> int | None:
+        if v is not None and not 1 <= v <= 12:
+            raise ValueError("Khối học phải từ 1 đến 12")
+        return v
 
 
 class ClassResponse(BaseModel):
@@ -19,6 +27,7 @@ class ClassResponse(BaseModel):
     name: str
     subject: str
     academic_year: str
+    grade: int | None
     is_active: bool
     created_at: datetime
 

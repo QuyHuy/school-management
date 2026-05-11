@@ -1,5 +1,5 @@
 import { apiClient } from "@/src/shared/api/client";
-import type { CreateStudentRequest, Student } from "../model/types";
+import type { CheckParentResponse, CreateStudentRequest, Student } from "../model/types";
 
 export async function listStudentsApi(): Promise<Student[]> {
   const { data } = await apiClient.get<Student[]>("/students");
@@ -18,5 +18,12 @@ export async function getStudentApi(id: string): Promise<Student> {
 
 export async function listStudentClassesApi(studentId: string): Promise<import("@/src/features/classes/model/types").Class[]> {
   const { data } = await apiClient.get(`/students/${studentId}/classes`);
+  return data;
+}
+
+export async function checkParentPhoneApi(phone: string): Promise<CheckParentResponse> {
+  const { data } = await apiClient.get<CheckParentResponse>(
+    `/students/check-parent?phone=${encodeURIComponent(phone)}`
+  );
   return data;
 }

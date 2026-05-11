@@ -51,7 +51,7 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
             return (
               <Link
                 key={href}
-                href={href}
+                href={href as never}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-semibold transition-colors ${
                   active
                     ? "bg-primary/8 text-primary"

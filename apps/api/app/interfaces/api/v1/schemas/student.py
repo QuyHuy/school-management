@@ -7,31 +7,40 @@ from pydantic import BaseModel, EmailStr, field_validator
 
 
 class ParentRequest(BaseModel):
-    name: str
-    email: EmailStr
-    phone: str | None = None
-    password: str
+    phone: str
+    name: str | None = None
+    email: EmailStr | None = None
+    password: str | None = None
 
     @field_validator("password")
     @classmethod
-    def validate_password(cls, v: str) -> str:
-        if len(v) < 6:
+    def validate_password(cls, v: str | None) -> str | None:
+        if v is not None and len(v) < 6:
             raise ValueError("Mật khẩu phải có ít nhất 6 ký tự")
         return v
-
-    @field_validator("name")
-    @classmethod
-    def validate_name(cls, v: str) -> str:
-        if not v.strip():
-            raise ValueError("Tên không được để trống")
-        return v.strip()
 
 
 class CreateStudentRequest(BaseModel):
     name: str
+    grade: int
     date_of_birth: date | None = None
     note: str | None = None
     parent: ParentRequest | None = None
+
+    @field_validator("grade")
+    @classmethod
+    def validate_grade(cls, v: int) -> int:
+        if not 1 <= v <= 12:
+            raise ValueError("Khối học phải từ 1 đến 12")
+        return v
+
+
+class CheckParentResponse(BaseModel):
+    exists: bool
+    is_parent: bool = True
+    name: str | None = None
+    phone: str | None = None
+    email: str | None = None
 
 
 class ParentInfo(BaseModel):
@@ -46,6 +55,8 @@ class StudentResponse(BaseModel):
     id: UUID
     organization_id: UUID
     name: str
+    student_code: str | None
+    grade: int | None
     date_of_birth: date | None
     note: str | None
     parent_id: UUID | None

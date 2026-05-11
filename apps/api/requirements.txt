@@ -24,8 +24,9 @@ celery[redis]==5.4.0
 httpx==0.28.0
 
 # Validation & settings
-pydantic==2.10.3
+pydantic[email]==2.10.3
 pydantic-settings==2.6.1
+email-validator==2.2.0
 
 # Monitoring
 sentry-sdk[fastapi]==2.19.2
