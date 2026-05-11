@@ -11,7 +11,7 @@ from app.domain.repositories.user_repository import IUserRepository
 @dataclass
 class UpdateTeacherInput:
     name: str
-    email: str | None
+    email: str
     phone: str | None
 
 
