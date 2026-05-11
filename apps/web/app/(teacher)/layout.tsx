@@ -9,6 +9,7 @@ const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: "⊞" },
   { href: "/classes", label: "Lớp học", icon: "📚" },
   { href: "/students", label: "Học sinh", icon: "👤" },
+  { href: "/feedback", label: "Phản hồi PH", icon: "💬" },
 ];
 
 export default function TeacherLayout({ children }: { children: React.ReactNode }) {

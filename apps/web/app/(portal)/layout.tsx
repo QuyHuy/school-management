@@ -11,6 +11,7 @@ const NAV = [
   { href: "/parent/home", label: "Trang chủ", icon: "⊞" },
   { href: "/parent/grades", label: "Điểm số", icon: "📝" },
   { href: "/parent/attendance", label: "Điểm danh", icon: "✓" },
+  { href: "/parent/notifications", label: "Thông báo", icon: "🔔" },
   { href: "/parent/profile", label: "Tài khoản", icon: "👤" },
 ];
 
