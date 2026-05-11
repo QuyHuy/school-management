@@ -103,3 +103,7 @@ app.include_router(parent.router, prefix="/api/v1/parent", tags=["parent"])
 from app.interfaces.api.v1.routers import admin  # noqa: E402
 
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["admin"])
+
+from app.interfaces.api.v1.routers import notifications  # noqa: E402
+
+app.include_router(notifications.router, prefix="/api/v1", tags=["notifications"])
