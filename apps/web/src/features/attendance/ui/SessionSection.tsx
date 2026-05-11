@@ -10,6 +10,7 @@ import type { AttendanceRecord, ClassSession } from "../model/types";
 import { AttendanceSheet } from "./AttendanceSheet";
 import type { Enrollment } from "@/src/features/classes/model/types";
 import type { Student } from "@/src/features/students/model/types";
+import { sendZaloAttendanceNotifications } from "@/src/features/zalo/api/zalo.api";
 
 interface Props {
   classId: string;
@@ -33,6 +34,8 @@ export function SessionSection({ classId, enrollments, students }: Props) {
   const [newDate, setNewDate] = useState("");
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [sendingZalo, setSendingZalo] = useState(false);
+  const [zaloResult, setZaloResult] = useState<string | null>(null);
 
   useEffect(() => {
     listSessionsApi(classId)
@@ -72,6 +75,20 @@ export function SessionSection({ classId, enrollments, students }: Props) {
       );
     } finally {
       setCreating(false);
+    }
+  }
+
+  async function handleSendZalo() {
+    if (!selectedSession || sendingZalo) return;
+    setSendingZalo(true);
+    setZaloResult(null);
+    try {
+      const result = await sendZaloAttendanceNotifications(classId, selectedSession.id);
+      setZaloResult(`Đã gửi ${result.sent_count} thông báo Zalo (bỏ qua ${result.skipped_count}).`);
+    } catch {
+      setZaloResult("Lỗi khi gửi thông báo Zalo.");
+    } finally {
+      setSendingZalo(false);
     }
   }
 
@@ -136,6 +153,18 @@ export function SessionSection({ classId, enrollments, students }: Props) {
                       onSaved={(records) => setAttendanceRecords(records)}
                     />
                   )}
+                  <div className="mt-3 flex flex-col gap-2">
+                    <button
+                      onClick={handleSendZalo}
+                      disabled={sendingZalo}
+                      className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                    >
+                      {sendingZalo ? "Đang gửi..." : "Gửi Zalo cho phụ huynh"}
+                    </button>
+                    {zaloResult && (
+                      <p className="text-xs text-center text-ash">{zaloResult}</p>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
