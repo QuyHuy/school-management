@@ -4,3 +4,4 @@ from app.infrastructure.db.models.class_ import ClassModel, ClassScheduleModel, 
 from app.infrastructure.db.models.attendance import ClassSessionModel, AttendanceRecordModel  # noqa: F401
 from app.infrastructure.db.models.exam import ExamModel, GradeModel  # noqa: F401
 from app.infrastructure.db.models.notification import NotificationModel, FeedbackModel  # noqa: F401
+from app.infrastructure.db.models.zalo import ZaloBindingModel  # noqa: F401
