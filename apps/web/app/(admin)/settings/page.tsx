@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getSettings, updateSettings } from "@/src/features/admin/api/admin.api";
 import type { OrgSettings } from "@/src/features/admin/model/types";
 
@@ -19,6 +19,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // form fields
   const [name, setName] = useState("");
@@ -30,9 +31,12 @@ export default function SettingsPage() {
   const [zaloToken, setZaloToken] = useState("");
 
   function showToast(msg: string) {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
     setToast(msg);
-    setTimeout(() => setToast(null), 3000);
+    toastTimer.current = setTimeout(() => setToast(null), 3000);
   }
+
+  useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current); }, []);
 
   useEffect(() => {
     getSettings().then((s) => {
