@@ -48,3 +48,12 @@ class ProfileResponse(BaseModel):
     phone: str | None
     email: str | None
     role: str
+
+
+class OTPRequestSchema(BaseModel):
+    phone: str
+
+
+class OTPVerifySchema(BaseModel):
+    phone: str
+    code: str

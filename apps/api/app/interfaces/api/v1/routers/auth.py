@@ -6,9 +6,12 @@ from app.application.use_cases.auth.login import LoginUseCase
 from app.application.use_cases.auth.logout import LogoutUseCase
 from app.application.use_cases.auth.parent_login import ParentLoginUseCase
 from app.application.use_cases.auth.refresh_token import RefreshTokenUseCase
+from app.application.use_cases.auth.request_otp import RequestOTPUseCase
+from app.application.use_cases.auth.verify_otp import VerifyOTPUseCase
 from app.application.use_cases.parent.update_profile import UpdateParentProfileUseCase, UpdateProfileInput
 from app.infrastructure.cache.redis_client import get_redis
 from app.infrastructure.db.repositories.user_repository import SQLUserRepository
+from app.infrastructure.db.repositories.zalo_repository import SQLZaloRepository
 from app.infrastructure.db.session import get_db
 from app.interfaces.api.v1.dependencies import get_current_user, require_role
 from app.interfaces.api.v1.schemas.auth import (
@@ -16,6 +19,8 @@ from app.interfaces.api.v1.schemas.auth import (
     LoginResponse,
     LogoutRequest,
     MeResponse,
+    OTPRequestSchema,
+    OTPVerifySchema,
     ParentLoginRequest,
     ProfileResponse,
     RefreshRequest,
@@ -115,3 +120,24 @@ async def update_profile(
         email=user.email,
         role=user.role.value,
     )
+
+
+@router.post("/otp/request", status_code=204)
+async def request_otp(
+    body: OTPRequestSchema,
+    db: AsyncSession = Depends(get_db),
+    redis=Depends(get_redis),
+):
+    use_case = RequestOTPUseCase(SQLUserRepository(db), SQLZaloRepository(db), redis)
+    await use_case.execute(body.phone)
+    return Response(status_code=204)
+
+
+@router.post("/otp/verify", response_model=LoginResponse)
+async def verify_otp(
+    body: OTPVerifySchema,
+    db: AsyncSession = Depends(get_db),
+    redis=Depends(get_redis),
+):
+    result = await VerifyOTPUseCase(SQLUserRepository(db), redis).execute(body.phone, body.code)
+    return LoginResponse(access_token=result.access_token, refresh_token=result.refresh_token)
