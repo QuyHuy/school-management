@@ -37,6 +37,13 @@ class SQLUserRepository(IUserRepository):
         row = result.scalar_one_or_none()
         return _to_domain(row) if row else None
 
+    async def get_by_phone(self, phone: str) -> User | None:
+        result = await self._session.execute(
+            select(UserModel).where(UserModel.phone == phone, UserModel.deleted_at.is_(None))
+        )
+        row = result.scalar_one_or_none()
+        return _to_domain(row) if row else None
+
     async def get_by_id(self, user_id: UUID) -> User | None:
         result = await self._session.execute(
             select(UserModel).where(UserModel.id == user_id, UserModel.deleted_at.is_(None))
@@ -59,3 +66,37 @@ class SQLUserRepository(IUserRepository):
         await self._session.flush()
         await self._session.refresh(row)
         return _to_domain(row)
+
+    async def update(self, user: User) -> User:
+        result = await self._session.execute(
+            select(UserModel).where(UserModel.id == user.id, UserModel.deleted_at.is_(None))
+        )
+        row = result.scalar_one_or_none()
+        if not row:
+            raise ValueError(f"User {user.id} not found")
+        row.name = user.name
+        row.phone = user.phone
+        row.email = user.email
+        await self._session.flush()
+        await self._session.refresh(row)
+        return _to_domain(row)
+
+    async def update_password(self, user_id: UUID, new_hash: str) -> None:
+        result = await self._session.execute(
+            select(UserModel).where(UserModel.id == user_id, UserModel.deleted_at.is_(None))
+        )
+        row = result.scalar_one_or_none()
+        if not row:
+            raise ValueError(f"User {user_id} not found")
+        row.password_hash = new_hash
+        await self._session.flush()
+
+    async def set_active(self, user_id: UUID, is_active: bool) -> None:
+        result = await self._session.execute(
+            select(UserModel).where(UserModel.id == user_id, UserModel.deleted_at.is_(None))
+        )
+        row = result.scalar_one_or_none()
+        if not row:
+            raise ValueError(f"User {user_id} not found")
+        row.is_active = is_active
+        await self._session.flush()
