@@ -46,7 +46,7 @@ export default function TeacherDetailPage() {
     if (!teacher) return;
     setSaving(true);
     try {
-      const updated = await updateTeacher(id, { name, email: email || null, phone: phone || null });
+      const updated = await updateTeacher(id, { name, email, phone: phone || null });
       setTeacher(updated);
       setEditing(false);
       showToast("Đã lưu thông tin.");
