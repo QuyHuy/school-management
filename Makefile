@@ -74,6 +74,19 @@ type-check:
 	$(API_EXEC) mypy app
 	pnpm --filter @school/web type-check
 
+# ── Deploy helpers ───────────────────────────────────────────────────────────
+.PHONY: ps restart rollback
+
+ps:  ## Show running production containers
+	docker compose ps
+
+restart:  ## Restart api and web without rebuild (production)
+	docker compose restart api web
+	docker compose exec nginx nginx -s reload
+
+rollback:  ## Roll back one migration (production)
+	docker compose exec api alembic downgrade -1
+
 # ── Utilities ────────────────────────────────────────────────────────────────
 clean:
 	$(COMPOSE) down -v --remove-orphans
