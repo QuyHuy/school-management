@@ -34,6 +34,7 @@ class GetReportAttendanceUseCase:
                 func.sum(case((AttendanceRecordModel.status == "present", 1), else_=0)).label("present"),
                 func.sum(case((AttendanceRecordModel.status == "absent", 1), else_=0)).label("absent"),
             )
+            .select_from(ClassSessionModel)
             .join(ClassModel, ClassModel.id == ClassSessionModel.class_id)
             .join(UserModel, UserModel.id == ClassModel.teacher_id)
             .outerjoin(AttendanceRecordModel, AttendanceRecordModel.session_id == ClassSessionModel.id)
