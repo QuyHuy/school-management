@@ -99,3 +99,7 @@ app.include_router(dashboard.router, prefix="/api/v1", tags=["dashboard"])
 from app.interfaces.api.v1.routers import parent  # noqa: E402
 
 app.include_router(parent.router, prefix="/api/v1/parent", tags=["parent"])
+
+from app.interfaces.api.v1.routers import admin  # noqa: E402
+
+app.include_router(admin.router, prefix="/api/v1/admin", tags=["admin"])
