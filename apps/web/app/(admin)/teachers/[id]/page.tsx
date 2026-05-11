@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getTeacher, updateTeacher, resetTeacherPassword, toggleTeacher } from "@/src/features/admin/api/admin.api";
 import type { TeacherDetail } from "@/src/features/admin/model/types";
@@ -21,11 +21,16 @@ export default function TeacherDetailPage() {
   const [newPwd, setNewPwd] = useState("");
   const [resetting, setResetting] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [toggling, setToggling] = useState(false);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function showToast(msg: string) {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
     setToast(msg);
-    setTimeout(() => setToast(null), 3000);
+    toastTimer.current = setTimeout(() => setToast(null), 3000);
   }
+
+  useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current); }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -68,10 +73,17 @@ export default function TeacherDetailPage() {
   }
 
   async function handleToggle() {
-    if (!teacher) return;
-    const updated = await toggleTeacher(id);
-    setTeacher(updated);
-    showToast(updated.is_active ? "Đã kích hoạt lại." : "Đã vô hiệu hóa.");
+    if (!teacher || toggling) return;
+    setToggling(true);
+    try {
+      const updated = await toggleTeacher(id);
+      setTeacher(updated);
+      showToast(updated.is_active ? "Đã kích hoạt lại." : "Đã vô hiệu hóa.");
+    } catch {
+      showToast("Lỗi khi thay đổi trạng thái.");
+    } finally {
+      setToggling(false);
+    }
   }
 
   if (loading) return <p className="text-ash text-sm">Đang tải...</p>;
@@ -137,7 +149,8 @@ export default function TeacherDetailPage() {
           </button>
           <button
             onClick={handleToggle}
-            className={`rounded-sm px-4 py-2 text-sm font-semibold transition-colors ${
+            disabled={toggling}
+            className={`rounded-sm px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50 ${
               teacher.is_active
                 ? "border border-error text-error hover:bg-error/5"
                 : "border border-success text-success hover:bg-success/5"
