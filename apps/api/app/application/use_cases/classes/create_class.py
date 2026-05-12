@@ -18,7 +18,7 @@ class CreateClassUseCase:
         name: str,
         subject: str,
         academic_year: str,
-        grade: int,
+        grade: int | None,
     ) -> Class:
         class_ = Class(
             id=uuid.uuid4(),

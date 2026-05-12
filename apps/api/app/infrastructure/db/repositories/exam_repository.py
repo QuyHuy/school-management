@@ -103,7 +103,7 @@ class SQLExamRepository(IExamRepository):
             }
             for g in grades
         ])
-        stmt = stmt.on_conflict_do_update(
+        returning_stmt = stmt.on_conflict_do_update(
             constraint="uq_grade",
             set_={
                 "score": stmt.excluded.score,
@@ -112,7 +112,7 @@ class SQLExamRepository(IExamRepository):
                 "graded_at": stmt.excluded.graded_at,
             },
         ).returning(GradeModel)
-        result = await self._session.execute(stmt)
+        result = await self._session.execute(returning_stmt)
         return [_grade_to_domain(row) for row in result.scalars()]
 
     async def list_grades(self, exam_id: UUID) -> list[Grade]:

@@ -63,7 +63,7 @@ class CreateStudentUseCase:
                 parent_user = User(
                     id=uuid.uuid4(),
                     organization_id=org_id,
-                    email=parent.email,
+                    email=parent.email or "",
                     password_hash=hash_password(parent.password),
                     role=UserRole.parent,
                     name=parent.name,

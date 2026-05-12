@@ -77,12 +77,12 @@ class GetCalendarUseCase:
         # Ad-hoc sessions (not matching any schedule)
         for session in sessions_in_month:
             if session.id not in scheduled_session_ids:
-                class_ = class_map.get(session.class_id)
-                if class_:
+                adhoc_class = class_map.get(session.class_id)
+                if adhoc_class:
                     sessions_out.append(CalendarSession(
                         id=session.id,
                         class_id=session.class_id,
-                        class_name=class_.name,
+                        class_name=adhoc_class.name,
                         date=session.date,
                         start_time=None,
                         end_time=None,

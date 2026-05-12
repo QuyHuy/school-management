@@ -158,4 +158,5 @@ class SQLFeedbackRepository(IFeedbackRepository):
             )
         )
         m = await self._db.get(FeedbackModel, feedback_id)
+        assert m is not None
         return _to_feedback(m)

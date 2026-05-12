@@ -21,7 +21,7 @@ class UpdateParentProfileUseCase:
     async def execute(self, user_id: UUID, data: UpdateProfileInput):
         user = await self._user_repo.get_by_id(user_id)
         if not user:
-            raise NotFoundError("User not found")
+            raise NotFoundError("User", str(user_id))
 
         if data.phone and data.phone != user.phone:
             existing = await self._user_repo.get_by_phone(data.phone)

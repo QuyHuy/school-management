@@ -3,7 +3,7 @@ import asyncio
 from app.infrastructure.celery_app import celery_app
 
 
-@celery_app.task(name="send_zalo_message", queue="zalo_notifications", bind=True, max_retries=3)
+@celery_app.task(name="send_zalo_message", queue="zalo_notifications", bind=True, max_retries=3)  # type: ignore[misc]
 def send_zalo_message(self, zalo_user_id: str, text: str, access_token: str) -> None:
     from app.infrastructure.external.zalo.client import ZaloOAClient
 

@@ -1,3 +1,5 @@
+from typing import Any
+
 import httpx
 
 
@@ -7,7 +9,7 @@ class ZaloOAClient:
     def __init__(self, access_token: str) -> None:
         self._token = access_token
 
-    async def send_text(self, zalo_user_id: str, text: str) -> dict:
+    async def send_text(self, zalo_user_id: str, text: str) -> dict[str, Any]:
         async with httpx.AsyncClient(timeout=10.0) as client:
             resp = await client.post(
                 f"{self._BASE}/message",
@@ -21,4 +23,4 @@ class ZaloOAClient:
             data = resp.json()
             if data.get("error", 0) != 0:
                 raise ValueError(f"Zalo OA error {data['error']}: {data.get('message')}")
-            return data
+            return dict(data)

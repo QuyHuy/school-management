@@ -111,7 +111,7 @@ class SQLAttendanceRepository(IAttendanceRepository):
             }
             for r in records
         ])
-        stmt = stmt.on_conflict_do_update(
+        returning_stmt = stmt.on_conflict_do_update(
             constraint="uq_attendance_record",
             set_={
                 "status": stmt.excluded.status,
@@ -119,7 +119,7 @@ class SQLAttendanceRepository(IAttendanceRepository):
                 "marked_at": stmt.excluded.marked_at,
             },
         ).returning(AttendanceRecordModel)
-        result = await self._session.execute(stmt)
+        result = await self._session.execute(returning_stmt)
         return [_record_to_domain(row) for row in result.scalars()]
 
     async def list_attendance(self, session_id: UUID) -> list[AttendanceRecord]:
