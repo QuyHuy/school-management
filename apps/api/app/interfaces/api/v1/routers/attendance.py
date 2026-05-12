@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.application.use_cases.attendance.create_session import CreateSessionUseCase
+from app.application.use_cases.attendance.update_session import UpdateSessionUseCase
 from app.application.use_cases.attendance.send_zalo_notifications import SendZaloNotificationsUseCase
 from app.application.use_cases.attendance.get_session import GetSessionUseCase
 from app.application.use_cases.attendance.list_attendance import ListAttendanceUseCase
@@ -18,6 +19,7 @@ from app.interfaces.api.v1.schemas.attendance import (
     CreateSessionRequest,
     MarkAttendanceRequest,
     SessionResponse,
+    UpdateSessionRequest,
 )
 
 router = APIRouter()
@@ -98,3 +100,15 @@ async def send_zalo_attendance(
 ):
     result = await SendZaloNotificationsUseCase(db).execute(session_id, token.org_id)
     return {"sent_count": result.sent_count, "skipped_count": result.skipped_count}
+
+
+@router.patch("/{class_id}/sessions/{session_id}", response_model=SessionResponse)
+async def update_session(
+    class_id: UUID,
+    session_id: UUID,
+    body: UpdateSessionRequest,
+    token=Depends(_teacher),
+    db: AsyncSession = Depends(get_db),
+):
+    uc = UpdateSessionUseCase(SQLClassRepository(db), SQLAttendanceRepository(db))
+    return await uc.execute(class_id, session_id, token.org_id, body.notes)

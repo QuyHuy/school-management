@@ -41,3 +41,7 @@ class AttendanceRecordResponse(BaseModel):
     marked_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class UpdateSessionRequest(BaseModel):
+    notes: str | None = None

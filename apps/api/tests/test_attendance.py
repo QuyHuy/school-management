@@ -127,3 +127,23 @@ async def test_list_attendance(client: AsyncClient):
         assert resp.json()[0]["student_id"] == str(_STUDENT_ID)
     finally:
         app.dependency_overrides.pop(get_current_user, None)
+
+
+async def test_patch_session_notes(client: AsyncClient):
+    updated = ClassSession(
+        id=_SESSION_ID, class_id=_CLASS_ID,
+        date=date(2026, 5, 1), notes="Ghi chú mới", created_at=_NOW,
+    )
+    app.dependency_overrides[get_current_user] = _override
+    try:
+        with patch("app.interfaces.api.v1.routers.attendance.UpdateSessionUseCase") as MockUC:
+            MockUC.return_value.execute = AsyncMock(return_value=updated)
+            resp = await client.patch(
+                f"/api/v1/classes/{_CLASS_ID}/sessions/{_SESSION_ID}",
+                json={"notes": "Ghi chú mới"},
+                headers={"Authorization": "Bearer fake"},
+            )
+        assert resp.status_code == 200
+        assert resp.json()["notes"] == "Ghi chú mới"
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
