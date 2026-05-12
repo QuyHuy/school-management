@@ -46,3 +46,15 @@ export async function listAttendanceApi(
   );
   return data;
 }
+
+export async function patchSessionNotesApi(
+  classId: string,
+  sessionId: string,
+  notes: string | null,
+): Promise<ClassSession> {
+  const { data } = await apiClient.patch(
+    `/classes/${classId}/sessions/${sessionId}`,
+    { notes },
+  );
+  return data;
+}
