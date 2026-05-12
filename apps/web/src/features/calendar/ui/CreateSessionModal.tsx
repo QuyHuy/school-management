@@ -47,6 +47,7 @@ export function CreateSessionModal({ onCreated, onClose }: Props) {
             <select
               value={classId}
               onChange={(e) => setClassId(e.target.value)}
+              disabled={creating}
               className="rounded-sm border border-border bg-canvas px-3 py-2 text-sm text-ink focus:outline-none focus:border-primary"
             >
               <option value="">Chọn lớp...</option>
@@ -62,6 +63,7 @@ export function CreateSessionModal({ onCreated, onClose }: Props) {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
+              disabled={creating}
               className="rounded-sm border border-border bg-canvas px-3 py-2 text-sm text-ink focus:outline-none focus:border-primary"
             />
           </div>
