@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import UUID
 
 from sqlalchemy import select, update
@@ -104,7 +104,7 @@ class SQLNotificationRepository(INotificationRepository):
                 NotificationModel.id == notification_id,
                 NotificationModel.recipient_id == user_id,
             )
-            .values(read_at=datetime.now(timezone.utc))
+            .values(read_at=datetime.now(UTC))
         )
 
 
@@ -154,7 +154,7 @@ class SQLFeedbackRepository(IFeedbackRepository):
             .values(
                 reply_content=content,
                 replied_by_id=replied_by,
-                replied_at=datetime.now(timezone.utc),
+                replied_at=datetime.now(UTC),
             )
         )
         m = await self._db.get(FeedbackModel, feedback_id)

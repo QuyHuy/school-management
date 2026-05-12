@@ -1,11 +1,12 @@
 import uuid
-import pytest
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock
-from datetime import datetime, timezone
+
+import pytest
 
 from app.domain.repositories.zalo_repository import ZaloBinding
-from app.infrastructure.db.repositories.zalo_repository import SQLZaloRepository
 from app.infrastructure.db.models.zalo import ZaloBindingModel
+from app.infrastructure.db.repositories.zalo_repository import SQLZaloRepository
 
 
 def _make_model(**kwargs) -> ZaloBindingModel:
@@ -15,8 +16,8 @@ def _make_model(**kwargs) -> ZaloBindingModel:
     m.user_id = kwargs.get("user_id", uuid.uuid4())
     m.zalo_user_id = kwargs.get("zalo_user_id", "zalo123")
     m.is_following = kwargs.get("is_following", True)
-    m.bound_at = datetime.now(timezone.utc)
-    m.updated_at = datetime.now(timezone.utc)
+    m.bound_at = datetime.now(UTC)
+    m.updated_at = datetime.now(UTC)
     return m
 
 

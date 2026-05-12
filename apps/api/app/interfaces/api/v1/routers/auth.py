@@ -8,7 +8,10 @@ from app.application.use_cases.auth.parent_login import ParentLoginUseCase
 from app.application.use_cases.auth.refresh_token import RefreshTokenUseCase
 from app.application.use_cases.auth.request_otp import RequestOTPUseCase
 from app.application.use_cases.auth.verify_otp import VerifyOTPUseCase
-from app.application.use_cases.parent.update_profile import UpdateParentProfileUseCase, UpdateProfileInput
+from app.application.use_cases.parent.update_profile import (
+    UpdateParentProfileUseCase,
+    UpdateProfileInput,
+)
 from app.infrastructure.cache.redis_client import get_redis
 from app.infrastructure.db.repositories.user_repository import SQLUserRepository
 from app.infrastructure.db.repositories.zalo_repository import SQLZaloRepository

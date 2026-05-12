@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from app.domain.entities.class_ import Enrollment
 from app.domain.exceptions import ConflictError, NotFoundError, ValidationError
@@ -38,6 +38,6 @@ class EnrollStudentUseCase:
             class_id=class_id,
             student_id=student_id,
             parent_id=parent_id,
-            enrolled_at=datetime.now(timezone.utc),
+            enrolled_at=datetime.now(UTC),
         )
         return await self._class_repo.enroll(enrollment)

@@ -4,12 +4,14 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.application.use_cases.attendance.create_session import CreateSessionUseCase
-from app.application.use_cases.attendance.update_session import UpdateSessionUseCase
-from app.application.use_cases.attendance.send_zalo_notifications import SendZaloNotificationsUseCase
 from app.application.use_cases.attendance.get_session import GetSessionUseCase
 from app.application.use_cases.attendance.list_attendance import ListAttendanceUseCase
 from app.application.use_cases.attendance.list_sessions import ListSessionsUseCase
 from app.application.use_cases.attendance.mark_attendance import MarkAttendanceUseCase
+from app.application.use_cases.attendance.send_zalo_notifications import (
+    SendZaloNotificationsUseCase,
+)
+from app.application.use_cases.attendance.update_session import UpdateSessionUseCase
 from app.infrastructure.db.repositories.attendance_repository import SQLAttendanceRepository
 from app.infrastructure.db.repositories.class_repository import SQLClassRepository
 from app.infrastructure.db.session import get_db

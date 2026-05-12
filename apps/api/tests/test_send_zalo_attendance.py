@@ -1,6 +1,7 @@
 import uuid
-import pytest
 from unittest.mock import AsyncMock, patch
+
+import pytest
 
 from app.infrastructure.security.jwt import TokenData
 from app.interfaces.api.v1.dependencies import get_current_user

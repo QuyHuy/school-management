@@ -1,17 +1,18 @@
 import uuid
-import pytest
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, patch
-from datetime import datetime, timezone
 
-from app.application.use_cases.auth.refresh_token import RefreshTokenUseCase
+import pytest
+
 from app.application.use_cases.auth.logout import LogoutUseCase
+from app.application.use_cases.auth.refresh_token import RefreshTokenUseCase
 from app.domain.entities.user import User, UserRole
 from app.domain.exceptions import UnauthorizedError
 from app.infrastructure.security.jwt import TokenData
 
 _USER_ID = uuid.uuid4()
 _ORG_ID = uuid.uuid4()
-_NOW = datetime.now(timezone.utc)
+_NOW = datetime.now(UTC)
 
 
 def _make_user() -> User:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from app.domain.entities.attendance import AttendanceRecord
@@ -28,7 +28,7 @@ class MarkAttendanceUseCase:
         session = await self._att_repo.get_session(session_id, class_id)
         if not session:
             raise NotFoundError("ClassSession", str(session_id))
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         att_records = [
             AttendanceRecord(
                 id=uuid.uuid4(),

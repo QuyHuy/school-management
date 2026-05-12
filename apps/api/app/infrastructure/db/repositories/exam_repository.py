@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import UUID
 
 from sqlalchemy import select
@@ -80,7 +80,7 @@ class SQLExamRepository(IExamRepository):
         return [_exam_to_domain(r) for r in result.scalars()]
 
     async def delete(self, exam_id: UUID) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         result = await self._session.execute(
             select(ExamModel).where(ExamModel.id == exam_id, ExamModel.deleted_at.is_(None))
         )

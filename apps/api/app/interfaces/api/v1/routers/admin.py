@@ -15,7 +15,10 @@ from app.application.use_cases.admin.get_teacher import GetTeacherUseCase
 from app.application.use_cases.admin.list_teachers import ListTeachersUseCase
 from app.application.use_cases.admin.reset_password import ResetPasswordUseCase
 from app.application.use_cases.admin.toggle_teacher import ToggleTeacherUseCase
-from app.application.use_cases.admin.update_settings import UpdateSettingsInput, UpdateSettingsUseCase
+from app.application.use_cases.admin.update_settings import (
+    UpdateSettingsInput,
+    UpdateSettingsUseCase,
+)
 from app.application.use_cases.admin.update_teacher import UpdateTeacherInput, UpdateTeacherUseCase
 from app.infrastructure.db.repositories.user_repository import SQLUserRepository
 from app.infrastructure.db.session import get_db

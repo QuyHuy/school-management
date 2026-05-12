@@ -1,8 +1,7 @@
 import uuid
-import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
-from app.main import app
+import pytest
 
 _ORG_ID = uuid.UUID("00000000-0000-0000-0000-000000000099")
 

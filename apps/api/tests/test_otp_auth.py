@@ -1,9 +1,9 @@
-import uuid
-import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
-from app.domain.exceptions import NotFoundError, UnauthorizedError
+import pytest
+
 from app.application.use_cases.auth.verify_otp import VerifyOTPResult
+from app.domain.exceptions import NotFoundError, UnauthorizedError
 
 
 @pytest.mark.asyncio

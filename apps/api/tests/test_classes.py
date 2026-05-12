@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, time, timezone
+from datetime import UTC, datetime, time
 from unittest.mock import AsyncMock, patch
 
 from httpx import AsyncClient
@@ -16,7 +16,7 @@ _CLASS_ID = uuid.UUID("00000000-0000-0000-0000-000000000010")
 _STUDENT_ID = uuid.UUID("00000000-0000-0000-0000-000000000003")
 _TOKEN = TokenData(user_id=_TEACHER_ID, org_id=_ORG_ID, role="teacher", jti="j", exp=9999999999)
 
-_NOW = datetime(2026, 1, 1, tzinfo=timezone.utc)
+_NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
 _CLASS = Class(
     id=_CLASS_ID, organization_id=_ORG_ID, teacher_id=_TEACHER_ID,

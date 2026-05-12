@@ -1,13 +1,10 @@
 import uuid
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from unittest.mock import AsyncMock
 
 import pytest
 
 from app.application.use_cases.attendance.create_session import CreateSessionUseCase
-from app.application.use_cases.attendance.get_session import GetSessionUseCase
-from app.application.use_cases.attendance.list_attendance import ListAttendanceUseCase
-from app.application.use_cases.attendance.list_sessions import ListSessionsUseCase
 from app.application.use_cases.attendance.mark_attendance import MarkAttendanceUseCase
 from app.domain.entities.attendance import AttendanceRecord, ClassSession
 from app.domain.entities.class_ import Class
@@ -17,7 +14,7 @@ _ORG_ID = uuid.UUID("00000000-0000-0000-0000-000000000002")
 _CLASS_ID = uuid.UUID("00000000-0000-0000-0000-000000000010")
 _SESSION_ID = uuid.UUID("00000000-0000-0000-0000-000000000020")
 _STUDENT_ID = uuid.UUID("00000000-0000-0000-0000-000000000003")
-_NOW = datetime(2026, 5, 1, tzinfo=timezone.utc)
+_NOW = datetime(2026, 5, 1, tzinfo=UTC)
 
 _CLASS = Class(
     id=_CLASS_ID, organization_id=_ORG_ID, teacher_id=uuid.uuid4(),

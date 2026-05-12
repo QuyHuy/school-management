@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import UUID
 
 from app.domain.entities.user import User, UserRole
@@ -28,7 +28,7 @@ class CreateTeacherUseCase:
         if existing:
             raise ConflictError(f"Email '{inp.email}' is already taken")
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         user = User(
             id=uuid.uuid4(),
             organization_id=org_id,

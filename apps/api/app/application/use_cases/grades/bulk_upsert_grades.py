@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from app.domain.entities.exam import Grade
 from app.domain.exceptions import NotFoundError, ValidationError
@@ -37,7 +37,7 @@ class BulkUpsertGradesUseCase:
                     f"Điểm {inp.score} vượt quá điểm tối đa {exam.max_score}"
                 )
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         grades = [
             Grade(
                 id=uuid.uuid4(),

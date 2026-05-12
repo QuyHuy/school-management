@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from app.domain.entities.class_ import Class
 from app.domain.repositories.class_repository import IClassRepository
@@ -29,8 +29,8 @@ class CreateClassUseCase:
             academic_year=academic_year,
             grade=grade,
             is_active=True,
-            created_at=datetime.now(timezone.utc),
-            updated_at=datetime.now(timezone.utc),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
             deleted_at=None,
         )
         return await self._repo.create(class_)

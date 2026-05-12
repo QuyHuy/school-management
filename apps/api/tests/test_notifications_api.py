@@ -1,9 +1,8 @@
 import uuid
-from datetime import datetime, timezone
-from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock, patch
 
 import pytest
-from httpx import AsyncClient
 
 from app.infrastructure.security.jwt import TokenData
 from app.interfaces.api.v1.dependencies import get_current_user
@@ -13,7 +12,7 @@ _ORG_ID = uuid.UUID("00000000-0000-0000-0000-000000000002")
 _TEACHER_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
 _PARENT_ID = uuid.UUID("00000000-0000-0000-0000-000000000003")
 _NOTIF_ID = uuid.UUID("00000000-0000-0000-0000-000000000010")
-_NOW = datetime(2026, 5, 11, tzinfo=timezone.utc)
+_NOW = datetime(2026, 5, 11, tzinfo=UTC)
 
 _TEACHER_TOKEN = TokenData(user_id=_TEACHER_ID, org_id=_ORG_ID, role="teacher", jti="j1", exp=9999999999)
 _PARENT_TOKEN = TokenData(user_id=_PARENT_ID, org_id=_ORG_ID, role="parent", jti="j2", exp=9999999999)

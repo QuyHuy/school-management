@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 from app.domain.entities.exam import Exam
 from app.domain.exceptions import NotFoundError, ValidationError
@@ -37,7 +37,7 @@ class CreateExamUseCase:
         if not class_:
             raise NotFoundError("Class", str(class_id))
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         exam = Exam(
             id=uuid.uuid4(),
             class_id=class_id,

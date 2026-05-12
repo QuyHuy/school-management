@@ -21,8 +21,8 @@ from app.interfaces.api.v1.schemas.class_ import (
     AddScheduleRequest,
     ClassResponse,
     CreateClassRequest,
-    EnrollRequest,
     EnrollmentResponse,
+    EnrollRequest,
     ScheduleResponse,
 )
 

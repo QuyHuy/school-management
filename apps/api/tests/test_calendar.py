@@ -1,5 +1,5 @@
 import uuid
-from datetime import date, time
+from datetime import UTC, date, time
 from unittest.mock import AsyncMock, patch
 
 from httpx import AsyncClient
@@ -52,7 +52,7 @@ async def test_get_calendar_invalid_month(client: AsyncClient):
 
 async def test_get_calendar_use_case_slot_logic():
     """Verify schedule-slot vs session split in GetCalendarUseCase."""
-    from datetime import date, datetime, time, timezone
+    from datetime import datetime
     from unittest.mock import AsyncMock
     from uuid import UUID
 
@@ -63,7 +63,7 @@ async def test_get_calendar_use_case_slot_logic():
 
     class_id = UUID("10000000-0000-0000-0000-000000000001")
     session_id = UUID("20000000-0000-0000-0000-000000000001")
-    _now = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    _now = datetime(2026, 1, 1, tzinfo=UTC)
 
     # May 2026: Tuesdays are 5, 12, 19, 26
     # We have a session on May 12 (Tuesday) — it should be a CalendarSession

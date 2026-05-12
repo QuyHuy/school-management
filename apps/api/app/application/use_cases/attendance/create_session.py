@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 from app.domain.entities.attendance import ClassSession
 from app.domain.exceptions import ConflictError, NotFoundError
@@ -31,6 +31,6 @@ class CreateSessionUseCase:
             class_id=class_id,
             date=session_date,
             notes=notes,
-            created_at=datetime.now(timezone.utc),
+            created_at=datetime.now(UTC),
         )
         return await self._att_repo.create_session(session)

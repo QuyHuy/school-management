@@ -6,7 +6,6 @@ from uuid import UUID
 
 from pydantic import BaseModel, field_validator
 
-
 ExamType = Literal["quiz", "midterm", "final", "assignment"]
 
 

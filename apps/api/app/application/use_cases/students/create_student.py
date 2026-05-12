@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 from app.domain.entities.student import Student
 from app.domain.entities.user import User, UserRole
@@ -69,8 +69,8 @@ class CreateStudentUseCase:
                     name=parent.name,
                     phone=parent.phone,
                     is_active=True,
-                    created_at=datetime.now(timezone.utc),
-                    updated_at=datetime.now(timezone.utc),
+                    created_at=datetime.now(UTC),
+                    updated_at=datetime.now(UTC),
                     deleted_at=None,
                 )
                 parent_user = await self._user_repo.create(parent_user)
@@ -87,8 +87,8 @@ class CreateStudentUseCase:
             date_of_birth=date_of_birth,
             note=note,
             parent_id=parent_user.id if parent_user else None,
-            created_at=datetime.now(timezone.utc),
-            updated_at=datetime.now(timezone.utc),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
             deleted_at=None,
         )
         return await self._student_repo.create(student)
