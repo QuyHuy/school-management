@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { BarChart2, Search } from "lucide-react";
 import { getGradesReport } from "@/src/features/admin/api/admin.api";
 import type { GradeReportRow } from "@/src/features/admin/model/types";
 
@@ -23,19 +24,28 @@ export default function GradesReportPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold text-ink">Báo cáo điểm số</h1>
+      <div>
+        <div className="flex items-center gap-2 mb-1">
+          <BarChart2 className="w-5 h-5 text-primary" />
+          <h1 className="text-2xl font-bold text-ink tracking-tight">Báo cáo điểm số</h1>
+        </div>
+        <p className="text-sm text-ash">Tổng hợp kết quả học tập theo lớp và giáo viên</p>
+      </div>
 
       <div className="bg-canvas border border-border rounded-sm p-4 flex gap-3 items-end">
         <button
           onClick={handleSearch}
           disabled={loading}
-          className="rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-canvas hover:bg-primary-hover transition-colors disabled:opacity-50"
         >
+          <Search className="w-4 h-4" />
           {loading ? "Đang tải..." : "Xem báo cáo"}
         </button>
       </div>
 
-      {error && <p className="text-sm text-error">{error}</p>}
+      {error && (
+        <div className="rounded-sm border border-error/20 bg-error/5 px-3 py-2.5 text-sm text-error">{error}</div>
+      )}
 
       {rows !== null && (
         <div className="bg-canvas border border-border rounded-sm overflow-hidden">
@@ -53,8 +63,8 @@ export default function GradesReportPage() {
             </thead>
             <tbody>
               {rows.map((r, i) => (
-                <tr key={i} className="border-b border-border last:border-0">
-                  <td className="px-5 py-3 text-ink">{r.teacher_name}</td>
+                <tr key={i} className="border-b border-border last:border-0 hover:bg-surface transition-colors">
+                  <td className="px-5 py-3 font-medium text-ink">{r.teacher_name}</td>
                   <td className="px-5 py-3 text-ink">{r.class_name}</td>
                   <td className="px-5 py-3 text-ash">{r.subject}</td>
                   <td className="px-5 py-3 text-right text-ash">{r.student_count}</td>
@@ -64,7 +74,9 @@ export default function GradesReportPage() {
                 </tr>
               ))}
               {rows.length === 0 && (
-                <tr><td colSpan={7} className="px-5 py-8 text-center text-ash text-sm">Chưa có dữ liệu</td></tr>
+                <tr>
+                  <td colSpan={7} className="px-5 py-8 text-center text-ash text-sm">Chưa có dữ liệu</td>
+                </tr>
               )}
             </tbody>
           </table>

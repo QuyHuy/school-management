@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { getClassApi, listSchedulesApi, listEnrollmentsApi } from "@/src/features/classes/api/classes.api";
 import { listSessionsApi } from "@/src/features/attendance/api/attendance.api";
 import { listExamsApi, listGradesApi } from "@/src/features/grades/api/grades.api";
@@ -124,7 +125,7 @@ export default function ClassDetailPage() {
   if (error) {
     return (
       <div className="max-w-3xl">
-        <Link href="/classes" className="text-sm text-ash hover:text-ink">← Danh sách lớp</Link>
+        <Link href="/classes" className="flex items-center gap-1.5 text-sm text-ash hover:text-ink transition-colors"><ArrowLeft className="w-4 h-4" />Danh sách lớp</Link>
         <div className="mt-4 rounded-md border border-error/20 bg-error/5 px-4 py-3 text-sm text-error">
           {error}
         </div>
@@ -138,8 +139,8 @@ export default function ClassDetailPage() {
     <div className="max-w-3xl flex flex-col gap-6">
       {/* Breadcrumb */}
       <div>
-        <Link href="/classes" className="text-sm text-ash hover:text-ink transition-colors">
-          ← Danh sách lớp
+        <Link href="/classes" className="flex items-center gap-1.5 text-sm text-ash hover:text-ink transition-colors">
+          <ArrowLeft className="w-4 h-4" />Danh sách lớp
         </Link>
 
         {/* Header */}

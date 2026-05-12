@@ -9,7 +9,7 @@ import type { ChildAttendanceRow } from "@/src/features/parent/model/types";
 const STATUS_CONFIG = {
   present: { label: "Có mặt", color: "text-success bg-success/10" },
   absent: { label: "Vắng", color: "text-error bg-error/10" },
-  late: { label: "Muộn", color: "text-amber-600 bg-amber-50" },
+  late: { label: "Muộn", color: "text-ink bg-surface" },
 } as const;
 
 function formatDate(d: string) {

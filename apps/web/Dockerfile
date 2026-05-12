@@ -16,6 +16,10 @@ COPY packages/ packages/
 COPY apps/web/ apps/web/
 WORKDIR /monorepo/apps/web
 ENV NEXT_TELEMETRY_DISABLED=1
+ARG NEXT_PUBLIC_API_URL=http://localhost
+ARG NEXT_PUBLIC_APP_URL=http://localhost
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 RUN pnpm build
 
 FROM base AS runner

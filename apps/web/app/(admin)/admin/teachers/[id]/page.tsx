@@ -2,10 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { ArrowLeft, Save, Edit3, Trash2, ChevronRight } from "lucide-react";
 import { getTeacher, updateTeacher, resetTeacherPassword, toggleTeacher } from "@/src/features/admin/api/admin.api";
 import type { TeacherDetail } from "@/src/features/admin/model/types";
 
-const inputCls = "rounded-sm border border-border px-4 py-3 text-sm text-ink focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink bg-canvas";
+const inputCls =
+  "w-full rounded-sm border border-border bg-canvas px-3 py-2.5 text-sm text-ink focus:outline-none focus:border-ink focus:ring-2 focus:ring-ink/10 transition-all";
 
 export default function TeacherDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -92,42 +94,66 @@ export default function TeacherDetailPage() {
   return (
     <div className="flex flex-col gap-6 max-w-3xl">
       {toast && (
-        <div className="fixed top-4 right-4 bg-ink text-white text-sm px-4 py-2 rounded shadow-lg z-50">{toast}</div>
+        <div className="fixed top-4 right-4 bg-ink text-canvas text-sm px-4 py-2 rounded shadow-lg z-50">{toast}</div>
       )}
 
-      <div className="flex items-center gap-3">
-        <button onClick={() => router.back()} className="text-ash hover:text-ink text-sm">← Quay lại</button>
-        <h1 className="text-2xl font-bold text-ink">{teacher.name}</h1>
-        <span className={`ml-2 text-xs px-2 py-0.5 rounded font-semibold ${teacher.is_active ? "bg-success/10 text-success" : "bg-error/10 text-error"}`}>
-          {teacher.is_active ? "Hoạt động" : "Vô hiệu"}
-        </span>
+      <div>
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-1.5 text-sm text-ash hover:text-ink transition-colors mb-4"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Quay lại
+        </button>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-ink tracking-tight">{teacher.name}</h1>
+          <span className={`text-xs px-2 py-0.5 rounded font-semibold ${teacher.is_active ? "bg-success/10 text-success" : "bg-error/10 text-error"}`}>
+            {teacher.is_active ? "Hoạt động" : "Vô hiệu"}
+          </span>
+        </div>
       </div>
 
       <div className="bg-canvas border border-border rounded-sm p-6 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold text-ink">Thông tin</h2>
           {!editing && (
-            <button onClick={() => setEditing(true)} className="text-sm text-primary font-semibold hover:underline">Chỉnh sửa</button>
+            <button
+              onClick={() => setEditing(true)}
+              className="flex items-center gap-1.5 text-sm text-primary font-semibold hover:underline"
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              Chỉnh sửa
+            </button>
           )}
         </div>
 
         {editing ? (
           <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-semibold text-ink">Họ tên</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-ash uppercase tracking-wide">Họ tên</label>
               <input value={name} onChange={(e) => setName(e.target.value)} className={inputCls} />
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-semibold text-ink">Email</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-ash uppercase tracking-wide">Email</label>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} />
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-semibold text-ink">Số điện thoại</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-ash uppercase tracking-wide">Số điện thoại</label>
               <input value={phone} onChange={(e) => setPhone(e.target.value)} className={inputCls} />
             </div>
             <div className="flex gap-3">
-              <button onClick={() => setEditing(false)} className="rounded-sm border border-border px-4 py-2 text-sm text-ink hover:bg-surface">Huỷ</button>
-              <button onClick={handleSave} disabled={saving} className="rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover disabled:opacity-50">
+              <button
+                onClick={() => setEditing(false)}
+                className="rounded-sm border border-border px-4 py-2 text-sm text-ink hover:bg-surface transition-colors"
+              >
+                Huỷ
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-canvas hover:bg-primary-hover disabled:opacity-50 transition-colors"
+              >
+                <Save className="w-3.5 h-3.5" />
                 {saving ? "Đang lưu..." : "Lưu"}
               </button>
             </div>
@@ -150,12 +176,13 @@ export default function TeacherDetailPage() {
           <button
             onClick={handleToggle}
             disabled={toggling}
-            className={`rounded-sm px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50 ${
+            className={`flex items-center gap-2 rounded-sm px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50 ${
               teacher.is_active
                 ? "border border-error text-error hover:bg-error/5"
                 : "border border-success text-success hover:bg-success/5"
             }`}
           >
+            <Trash2 className="w-3.5 h-3.5" />
             {teacher.is_active ? "Vô hiệu hóa" : "Kích hoạt lại"}
           </button>
         </div>
@@ -173,8 +200,18 @@ export default function TeacherDetailPage() {
               className={inputCls}
             />
             <div className="flex gap-3">
-              <button onClick={() => { setShowReset(false); setNewPwd(""); }} className="flex-1 rounded-sm border border-border px-4 py-2 text-sm text-ink hover:bg-surface">Huỷ</button>
-              <button onClick={handleResetPwd} disabled={resetting || !newPwd} className="flex-1 rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover disabled:opacity-50">
+              <button
+                onClick={() => { setShowReset(false); setNewPwd(""); }}
+                className="flex-1 rounded-sm border border-border px-4 py-2 text-sm text-ink hover:bg-surface transition-colors"
+              >
+                Huỷ
+              </button>
+              <button
+                onClick={handleResetPwd}
+                disabled={resetting || !newPwd}
+                className="flex-1 flex items-center justify-center gap-2 rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-canvas hover:bg-primary-hover disabled:opacity-50 transition-colors"
+              >
+                <Save className="w-3.5 h-3.5" />
                 {resetting ? "Đang lưu..." : "Xác nhận"}
               </button>
             </div>
@@ -194,11 +231,12 @@ export default function TeacherDetailPage() {
               <th className="text-left px-5 py-3">Năm học</th>
               <th className="text-right px-5 py-3">Số HS</th>
               <th className="text-center px-5 py-3">Trạng thái</th>
+              <th className="px-5 py-3"></th>
             </tr>
           </thead>
           <tbody>
             {teacher.classes.map((c) => (
-              <tr key={c.id} className="border-b border-border last:border-0">
+              <tr key={c.id} className="border-b border-border last:border-0 hover:bg-surface transition-colors cursor-default">
                 <td className="px-5 py-3 font-medium text-ink">{c.name}</td>
                 <td className="px-5 py-3 text-ash">{c.subject}</td>
                 <td className="px-5 py-3 text-ash">{c.academic_year}</td>
@@ -208,10 +246,13 @@ export default function TeacherDetailPage() {
                     {c.is_active ? "Đang dạy" : "Đã kết thúc"}
                   </span>
                 </td>
+                <td className="px-5 py-3 text-right text-stone">
+                  <ChevronRight className="w-4 h-4 ml-auto" />
+                </td>
               </tr>
             ))}
             {teacher.classes.length === 0 && (
-              <tr><td colSpan={5} className="px-5 py-8 text-center text-ash text-sm">Chưa có lớp nào</td></tr>
+              <tr><td colSpan={6} className="px-5 py-8 text-center text-ash text-sm">Chưa có lớp nào</td></tr>
             )}
           </tbody>
         </table>

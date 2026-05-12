@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { ClipboardList, Search } from "lucide-react";
 import { getAttendanceReport } from "@/src/features/admin/api/admin.api";
 import type { AttendanceReportRow } from "@/src/features/admin/model/types";
 
-const inputCls = "rounded-sm border border-border px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink bg-canvas";
+const inputCls =
+  "rounded-sm border border-border bg-canvas px-3 py-2.5 text-sm text-ink focus:outline-none focus:border-ink focus:ring-2 focus:ring-ink/10 transition-all";
 
 export default function AttendanceReportPage() {
   const [dateFrom, setDateFrom] = useState("");
@@ -31,27 +33,36 @@ export default function AttendanceReportPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold text-ink">Báo cáo điểm danh</h1>
+      <div>
+        <div className="flex items-center gap-2 mb-1">
+          <ClipboardList className="w-5 h-5 text-primary" />
+          <h1 className="text-2xl font-bold text-ink tracking-tight">Báo cáo điểm danh</h1>
+        </div>
+        <p className="text-sm text-ash">Thống kê chuyên cần theo lớp và giáo viên</p>
+      </div>
 
       <div className="bg-canvas border border-border rounded-sm p-4 flex flex-wrap gap-3 items-end">
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-ash">Từ ngày</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-ash uppercase tracking-wide">Từ ngày</label>
           <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className={inputCls} />
         </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-ash">Đến ngày</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-ash uppercase tracking-wide">Đến ngày</label>
           <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className={inputCls} />
         </div>
         <button
           onClick={handleSearch}
           disabled={loading}
-          className="rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-canvas hover:bg-primary-hover transition-colors disabled:opacity-50"
         >
+          <Search className="w-4 h-4" />
           {loading ? "Đang tải..." : "Xem báo cáo"}
         </button>
       </div>
 
-      {error && <p className="text-sm text-error">{error}</p>}
+      {error && (
+        <div className="rounded-sm border border-error/20 bg-error/5 px-3 py-2.5 text-sm text-error">{error}</div>
+      )}
 
       {rows !== null && (
         <div className="bg-canvas border border-border rounded-sm overflow-hidden">
@@ -69,18 +80,20 @@ export default function AttendanceReportPage() {
             </thead>
             <tbody>
               {rows.map((r, i) => (
-                <tr key={i} className="border-b border-border last:border-0">
-                  <td className="px-5 py-3 text-ink">{r.teacher_name}</td>
+                <tr key={i} className="border-b border-border last:border-0 hover:bg-surface transition-colors">
+                  <td className="px-5 py-3 font-medium text-ink">{r.teacher_name}</td>
                   <td className="px-5 py-3 text-ink">{r.class_name}</td>
                   <td className="px-5 py-3 text-ash">{r.subject}</td>
                   <td className="px-5 py-3 text-right text-ash">{r.total_sessions}</td>
-                  <td className="px-5 py-3 text-right text-ash">{r.present}</td>
-                  <td className="px-5 py-3 text-right text-ash">{r.absent}</td>
+                  <td className="px-5 py-3 text-right text-success">{r.present}</td>
+                  <td className="px-5 py-3 text-right text-error">{r.absent}</td>
                   <td className="px-5 py-3 text-right font-semibold text-ink">{r.attendance_rate}%</td>
                 </tr>
               ))}
               {rows.length === 0 && (
-                <tr><td colSpan={7} className="px-5 py-8 text-center text-ash text-sm">Chưa có dữ liệu</td></tr>
+                <tr>
+                  <td colSpan={7} className="px-5 py-8 text-center text-ash text-sm">Chưa có dữ liệu</td>
+                </tr>
               )}
             </tbody>
           </table>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { BookOpen } from "lucide-react";
 import { createClassApi } from "../api/classes.api";
 import { SUBJECTS, GRADES } from "@/src/shared/config/subjects";
 
@@ -28,12 +29,14 @@ export function CreateClassForm() {
     }
   }
 
-  const inputCls = "rounded-sm border border-border px-4 py-3 text-sm text-ink focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink bg-canvas";
+  const inputCls =
+    "w-full rounded-sm border border-border bg-canvas px-3 py-2.5 text-sm text-ink focus:outline-none focus:border-ink focus:ring-2 focus:ring-ink/10 transition-all";
+  const labelCls = "text-xs font-semibold text-ash uppercase tracking-wide";
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-md">
-      <div className="flex flex-col gap-1">
-        <label className="text-sm font-semibold text-ink">Tên lớp</label>
+      <div className="flex flex-col gap-1.5">
+        <label className={labelCls}>Tên lớp *</label>
         <input
           required
           value={name}
@@ -44,8 +47,8 @@ export function CreateClassForm() {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-ink">Môn học</label>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelCls}>Môn học</label>
           <select
             value={subject}
             onChange={(e) => setSubject(e.target.value as typeof SUBJECTS[number])}
@@ -57,8 +60,8 @@ export function CreateClassForm() {
           </select>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-ink">Khối</label>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelCls}>Khối</label>
           <select
             value={grade}
             onChange={(e) => setGrade(Number(e.target.value))}
@@ -71,8 +74,8 @@ export function CreateClassForm() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label className="text-sm font-semibold text-ink">Năm học</label>
+      <div className="flex flex-col gap-1.5">
+        <label className={labelCls}>Năm học *</label>
         <input
           required
           value={academicYear}
@@ -88,16 +91,17 @@ export function CreateClassForm() {
         <button
           type="button"
           onClick={() => router.back()}
-          className="rounded-sm border border-border px-4 py-3 text-sm font-semibold text-ink hover:bg-surface transition-colors"
+          className="rounded-sm border border-border px-4 py-2.5 text-sm font-semibold text-ink hover:bg-surface transition-colors"
         >
           Huỷ
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 rounded-sm bg-primary px-4 py-3 text-sm font-semibold text-white hover:bg-primary-hover transition-colors disabled:opacity-50"
+          className="flex flex-1 items-center justify-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-canvas hover:bg-primary-hover transition-colors disabled:opacity-50"
         >
-          {loading ? "Đang tạo..." : "Tạo lớp"}
+          <BookOpen className="w-4 h-4" />
+          {loading ? "Đang tạo..." : "Tạo lớp học"}
         </button>
       </div>
     </form>

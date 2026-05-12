@@ -75,7 +75,7 @@ export default function ParentNotificationsPage() {
       <h1 className="text-xl font-bold text-ink">Thông báo từ giáo viên</h1>
 
       {toast && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 rounded-md bg-primary px-4 py-2 text-sm text-white shadow-lg">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 rounded-sm bg-ink px-4 py-2 text-sm text-canvas shadow-lg">
           {toast}
         </div>
       )}
@@ -114,7 +114,7 @@ export default function ParentNotificationsPage() {
               <button
                 onClick={() => handleFeedback(notif)}
                 disabled={submitting === notif.id || !feedbackContent[notif.id]?.trim()}
-                className="self-end rounded-md bg-primary px-4 py-1.5 text-sm font-medium text-white disabled:opacity-50 transition-colors"
+                className="self-end rounded-sm bg-primary px-4 py-1.5 text-sm font-semibold text-canvas hover:bg-primary-hover disabled:opacity-50 transition-colors"
               >
                 {submitting === notif.id ? "Đang gửi..." : "Gửi phản hồi"}
               </button>

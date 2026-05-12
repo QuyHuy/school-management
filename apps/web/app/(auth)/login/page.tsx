@@ -31,7 +31,7 @@ export default function LoginSelectorPage() {
         {ROLES.map(({ href, icon: Icon, title, desc }) => (
           <Link
             key={href}
-            href={href}
+            href={href as never}
             className="group flex items-center gap-4 rounded-sm border border-border bg-canvas hover:border-ink hover:shadow-card px-4 py-4 transition-all"
           >
             <div className="w-10 h-10 rounded-sm bg-primary/8 flex items-center justify-center shrink-0 group-hover:bg-primary/12 transition-colors">

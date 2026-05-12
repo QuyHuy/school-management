@@ -276,7 +276,7 @@ export function ExamSection({ classId, students, filterDate }: Props) {
             <button
               type="submit"
               disabled={creating || !title.trim()}
-              className="flex-1 rounded-sm bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover disabled:opacity-50 transition-colors"
+              className="flex-1 rounded-sm bg-primary px-3 py-2 text-sm font-semibold text-canvas hover:bg-primary-hover disabled:opacity-50 transition-colors"
             >
               {creating ? "Đang tạo..." : "Tạo"}
             </button>

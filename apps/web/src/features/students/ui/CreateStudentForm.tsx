@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { UserPlus } from "lucide-react";
 import { createStudentApi, checkParentPhoneApi } from "../api/students.api";
 import { GRADES } from "@/src/shared/config/subjects";
 import type { Student, CheckParentResponse } from "../model/types";
@@ -115,7 +116,7 @@ export function CreateStudentForm({ onCreated, onCancel }: Props) {
   }
 
   const inputCls =
-    "w-full rounded-sm border border-border bg-canvas px-3 py-2.5 text-sm text-ink placeholder:text-stone focus:border-primary focus:outline-none transition-colors";
+    "w-full rounded-sm border border-border bg-canvas px-3 py-2.5 text-sm text-ink placeholder:text-stone focus:outline-none focus:border-ink focus:ring-2 focus:ring-ink/10 transition-all";
   const labelCls = "text-xs font-semibold text-ash uppercase tracking-wide";
 
   return (
@@ -215,7 +216,7 @@ export function CreateStudentForm({ onCreated, onCancel }: Props) {
                     type="button"
                     onClick={handleCheckPhone}
                     disabled={parentStep === "checking" || !parentPhone.trim()}
-                    className="shrink-0 rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-hover disabled:opacity-50 transition-colors"
+                    className="shrink-0 rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-canvas hover:bg-primary-hover disabled:opacity-50 transition-colors"
                   >
                     {parentStep === "checking" ? "Đang kiểm tra..." : "Kiểm tra"}
                   </button>
@@ -371,8 +372,9 @@ export function CreateStudentForm({ onCreated, onCancel }: Props) {
         <button
           type="submit"
           disabled={loading || !isReadyToSubmit()}
-          className="flex-1 rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-hover disabled:opacity-50 transition-colors"
+          className="flex flex-1 items-center justify-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-canvas hover:bg-primary-hover disabled:opacity-50 transition-colors"
         >
+          <UserPlus className="w-4 h-4" />
           {loading ? "Đang tạo..." : "Tạo học sinh"}
         </button>
       </div>

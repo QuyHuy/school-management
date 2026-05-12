@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Users, UserPlus, ChevronRight } from "lucide-react";
 import { listTeachers, toggleTeacher } from "@/src/features/admin/api/admin.api";
 import type { TeacherInfo } from "@/src/features/admin/model/types";
 
@@ -29,13 +30,20 @@ export default function TeachersPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-ink">Giáo viên</h1>
+      <div className="flex items-center justify-between mb-2">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <Users className="w-5 h-5 text-primary" />
+            <h1 className="text-2xl font-bold text-ink tracking-tight">Giáo viên</h1>
+          </div>
+          <p className="text-sm text-ash">Quản lý danh sách giáo viên của trung tâm</p>
+        </div>
         <button
           onClick={() => router.push("/admin/teachers/new" as never)}
-          className="rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-hover transition-colors"
+          className="flex items-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-canvas hover:bg-primary-hover transition-colors"
         >
-          + Thêm giáo viên
+          <UserPlus className="w-4 h-4" />
+          Thêm giáo viên
         </button>
       </div>
 
@@ -66,12 +74,13 @@ export default function TeachersPage() {
                   </span>
                 </td>
                 <td className="px-5 py-3 text-right">
-                  <div className="flex justify-end gap-2">
+                  <div className="flex justify-end items-center gap-2">
                     <button
                       onClick={() => router.push(`/admin/teachers/${t.id}` as never)}
-                      className="text-xs text-primary font-semibold hover:underline"
+                      className="flex items-center gap-1 text-xs text-primary font-semibold hover:underline"
                     >
                       Xem
+                      <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => handleToggle(t.id)}

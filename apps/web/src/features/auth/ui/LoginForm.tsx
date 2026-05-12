@@ -96,7 +96,7 @@ export function LoginForm({ redirectTo = "/dashboard", expectedRole }: Props) {
       <button
         type="submit"
         disabled={loading}
-        className="flex items-center justify-center gap-2 rounded-sm bg-primary px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-primary-hover active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed mt-1"
+        className="flex items-center justify-center gap-2 rounded-sm bg-primary px-4 py-3 text-sm font-semibold text-canvas transition-all hover:bg-primary-hover active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed mt-1"
       >
         {loading ? (
           <>

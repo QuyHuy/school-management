@@ -69,7 +69,7 @@ export function ParentLoginForm({ redirectTo = "/parent/home" }: Props) {
       <button
         type="submit"
         disabled={loading}
-        className="rounded-sm bg-primary px-4 py-3 text-sm font-semibold text-white transition active:scale-95 disabled:opacity-50 hover:bg-primary-hover"
+        className="rounded-sm bg-primary px-4 py-3 text-sm font-semibold text-canvas transition active:scale-95 disabled:opacity-50 hover:bg-primary-hover"
       >
         {loading ? "Đang đăng nhập..." : "Đăng nhập"}
       </button>

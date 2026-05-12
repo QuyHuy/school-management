@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Settings, Save } from "lucide-react";
 import { getSettings, updateSettings } from "@/src/features/admin/api/admin.api";
 import type { OrgSettings } from "@/src/features/admin/model/types";
 
-const inputCls = "rounded-sm border border-border px-4 py-3 text-sm text-ink focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink bg-canvas";
+const inputCls =
+  "w-full rounded-sm border border-border bg-canvas px-3 py-2.5 text-sm text-ink focus:outline-none focus:border-ink focus:ring-2 focus:ring-ink/10 transition-all";
+const labelCls = "text-xs font-semibold text-ash uppercase tracking-wide";
 
 function getAcademicYears(): string[] {
   const current = new Date().getFullYear();
@@ -80,29 +83,35 @@ export default function SettingsPage() {
   return (
     <div className="flex flex-col gap-6 max-w-lg">
       {toast && (
-        <div className="fixed top-4 right-4 bg-ink text-white text-sm px-4 py-2 rounded shadow-lg z-50">{toast}</div>
+        <div className="fixed top-4 right-4 bg-ink text-canvas text-sm px-4 py-2 rounded shadow-lg z-50">{toast}</div>
       )}
 
-      <h1 className="text-2xl font-bold text-ink">Cài đặt trung tâm</h1>
+      <div>
+        <div className="flex items-center gap-2 mb-1">
+          <Settings className="w-5 h-5 text-primary" />
+          <h1 className="text-2xl font-bold text-ink tracking-tight">Cài đặt trung tâm</h1>
+        </div>
+        <p className="text-sm text-ash">Thông tin và cấu hình trung tâm</p>
+      </div>
 
       <form onSubmit={handleSave} className="flex flex-col gap-4 bg-canvas border border-border rounded-sm p-6">
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-ink">Tên trung tâm *</label>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelCls}>Tên trung tâm *</label>
           <input required value={name} onChange={(e) => setName(e.target.value)} className={inputCls} />
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-ink">Số điện thoại</label>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelCls}>Số điện thoại</label>
           <input value={phone} onChange={(e) => setPhone(e.target.value)} className={inputCls} placeholder="0901234567" />
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-ink">Địa chỉ</label>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelCls}>Địa chỉ</label>
           <textarea value={address} onChange={(e) => setAddress(e.target.value)} rows={2} className={`${inputCls} resize-none`} />
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-ink">Năm học</label>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelCls}>Năm học</label>
           <select value={academicYear} onChange={(e) => setAcademicYear(e.target.value)} className={inputCls}>
             <option value="">— Chọn năm học —</option>
             {getAcademicYears().map((y) => (
@@ -111,22 +120,22 @@ export default function SettingsPage() {
           </select>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-ink">Logo URL</label>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelCls}>Logo URL</label>
           <input value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} className={inputCls} placeholder="https://example.com/logo.png" />
         </div>
 
         <div className="border-t border-border pt-4 flex flex-col gap-3">
           <p className="text-xs text-ash font-semibold uppercase tracking-wide">Zalo OA (tuỳ chọn)</p>
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-semibold text-ink">Zalo OA ID</label>
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Zalo OA ID</label>
             <input value={zaloOaId} onChange={(e) => setZaloOaId(e.target.value)} className={inputCls} />
           </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-semibold text-ink">
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>
               Zalo OA Token
               {settings?.zalo_oa_token && (
-                <span className="ml-2 text-xs text-ash font-normal">({settings.zalo_oa_token})</span>
+                <span className="ml-2 text-xs text-ash font-normal normal-case">({settings.zalo_oa_token})</span>
               )}
             </label>
             <input
@@ -142,8 +151,9 @@ export default function SettingsPage() {
         <button
           type="submit"
           disabled={saving}
-          className="rounded-sm bg-primary px-4 py-3 text-sm font-semibold text-white hover:bg-primary-hover transition-colors disabled:opacity-50"
+          className="flex items-center justify-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-canvas hover:bg-primary-hover transition-colors disabled:opacity-50"
         >
+          <Save className="w-4 h-4" />
           {saving ? "Đang lưu..." : "Lưu cài đặt"}
         </button>
       </form>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { getSessionApi, listAttendanceApi, patchSessionNotesApi } from "@/src/features/attendance/api/attendance.api";
 import { getClassApi, listEnrollmentsApi } from "@/src/features/classes/api/classes.api";
 import { listStudentsApi } from "@/src/features/students/api/students.api";
@@ -112,8 +113,8 @@ export default function SessionDetailPage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-4">
         <p className="text-sm text-error">{error ?? "Không tìm thấy buổi học."}</p>
-        <Link href="/dashboard" className="text-sm font-semibold text-primary hover:underline">
-          ← Quay lại lịch dạy
+        <Link href="/dashboard" className="flex items-center gap-1.5 text-sm text-ash hover:text-ink transition-colors">
+          <ArrowLeft className="w-4 h-4" />Quay lại lịch dạy
         </Link>
       </div>
     );
@@ -190,7 +191,7 @@ export default function SessionDetailPage() {
           <button
             onClick={handleSaveNotes}
             disabled={savingNotes}
-            className="rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover disabled:opacity-50 transition-colors"
+            className="rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-canvas hover:bg-primary-hover disabled:opacity-50 transition-colors"
           >
             {savingNotes ? "Đang lưu..." : "Lưu ghi chú"}
           </button>

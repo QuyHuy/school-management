@@ -52,7 +52,7 @@ export default function ParentProfilePage() {
   }
 
   const inputCls =
-    "w-full rounded-sm border border-border bg-canvas px-3 py-2.5 text-sm text-ink placeholder:text-stone focus:border-primary focus:outline-none transition-colors";
+    "w-full rounded-sm border border-border bg-canvas px-3 py-2.5 text-sm text-ink placeholder:text-stone focus:outline-none focus:border-ink focus:ring-2 focus:ring-ink/10 transition-all";
   const labelCls = "text-xs font-semibold text-ash uppercase tracking-wide";
 
   if (loading) {
@@ -130,7 +130,7 @@ export default function ParentProfilePage() {
           <button
             type="submit"
             disabled={saving}
-            className="rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-hover disabled:opacity-50 transition-colors"
+            className="rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-canvas hover:bg-primary-hover disabled:opacity-50 transition-colors"
           >
             {saving ? "Đang lưu..." : "Lưu thay đổi"}
           </button>

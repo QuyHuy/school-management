@@ -73,7 +73,7 @@ export function AddScheduleForm({ classId, onAdded }: Props) {
       <button
         type="submit"
         disabled={loading}
-        className="rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover transition-colors disabled:opacity-50"
+        className="rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-canvas hover:bg-primary-hover transition-colors disabled:opacity-50"
       >
         {loading ? (
           "Đang thêm..."

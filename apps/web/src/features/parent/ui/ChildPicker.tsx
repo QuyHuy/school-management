@@ -17,7 +17,7 @@ export function ChildPicker() {
             onClick={() => selectChild(c.student_id)}
             className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold transition-colors border ${
               active
-                ? "bg-primary text-white border-primary"
+                ? "bg-primary text-canvas border-primary"
                 : "bg-canvas text-ash border-border hover:border-ink hover:text-ink"
             }`}
           >
