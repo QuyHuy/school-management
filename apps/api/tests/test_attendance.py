@@ -147,3 +147,20 @@ async def test_patch_session_notes(client: AsyncClient):
         assert resp.json()["notes"] == "Ghi chú mới"
     finally:
         app.dependency_overrides.pop(get_current_user, None)
+
+
+async def test_patch_session_notes_not_found(client: AsyncClient):
+    app.dependency_overrides[get_current_user] = _override
+    try:
+        with patch("app.interfaces.api.v1.routers.attendance.UpdateSessionUseCase") as MockUC:
+            MockUC.return_value.execute = AsyncMock(
+                side_effect=NotFoundError("Session", str(_SESSION_ID))
+            )
+            resp = await client.patch(
+                f"/api/v1/classes/{_CLASS_ID}/sessions/{_SESSION_ID}",
+                json={"notes": "x"},
+                headers={"Authorization": "Bearer fake"},
+            )
+        assert resp.status_code == 404
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
