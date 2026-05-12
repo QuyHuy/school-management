@@ -111,3 +111,7 @@ app.include_router(notifications.router, prefix="/api/v1", tags=["notifications"
 from app.interfaces.api.v1.routers import zalo  # noqa: E402
 
 app.include_router(zalo.router, prefix="/api/v1/zalo", tags=["zalo"])
+
+from app.interfaces.api.v1.routers import calendar as calendar_router  # noqa: E402
+
+app.include_router(calendar_router.router, prefix="/api/v1", tags=["calendar"])
