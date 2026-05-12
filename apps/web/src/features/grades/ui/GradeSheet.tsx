@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Save } from "lucide-react";
 import { bulkUpsertGradesApi } from "../api/grades.api";
 import type { Exam, Grade, GradeIn } from "../model/types";
 import type { Student } from "@/src/features/students/model/types";
@@ -130,7 +131,14 @@ export function GradeSheet({ classId, exam, students, initialGrades, onSaved }: 
           disabled={saving}
           className="px-5 py-2 text-sm font-semibold text-white bg-primary rounded-sm hover:bg-primary-hover disabled:opacity-50 transition-colors"
         >
-          {saving ? "Đang lưu..." : "Lưu điểm"}
+          {saving ? (
+            "Đang lưu..."
+          ) : (
+            <span className="flex items-center gap-1.5">
+              <Save className="w-4 h-4" />
+              Lưu điểm
+            </span>
+          )}
         </button>
       </div>
     </div>

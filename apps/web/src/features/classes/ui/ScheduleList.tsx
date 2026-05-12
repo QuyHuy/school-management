@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Trash2 } from "lucide-react";
 import { deleteScheduleApi } from "../api/classes.api";
 import type { ClassSchedule } from "../model/types";
 
@@ -37,15 +38,17 @@ export function ScheduleList({ classId, schedules, onDeleted }: Props) {
         {schedules.map((s) => (
           <li
             key={s.id}
-            className="flex items-center justify-between rounded border border-border px-4 py-2 text-sm"
+            className="flex items-center justify-between rounded-full border border-border px-4 py-2 text-sm"
           >
             <span className="text-ink">
               {DAYS[s.day_of_week]} · {s.start_time.slice(0, 5)} – {s.end_time.slice(0, 5)}
             </span>
             <button
               onClick={() => handleDelete(s.id)}
-              className="text-xs text-error hover:underline"
+              className="flex items-center gap-1.5 text-xs text-error hover:text-error/80 transition-colors"
+              title="Xoá lịch học"
             >
+              <Trash2 className="w-4 h-4" />
               Xoá
             </button>
           </li>

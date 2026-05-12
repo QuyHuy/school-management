@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Plus } from "lucide-react";
 import { addScheduleApi } from "../api/classes.api";
 import type { ClassSchedule } from "../model/types";
 
@@ -74,7 +75,14 @@ export function AddScheduleForm({ classId, onAdded }: Props) {
         disabled={loading}
         className="rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover transition-colors disabled:opacity-50"
       >
-        {loading ? "Đang thêm..." : "+ Thêm lịch"}
+        {loading ? (
+          "Đang thêm..."
+        ) : (
+          <span className="flex items-center gap-1.5">
+            <Plus className="w-4 h-4" />
+            Thêm lịch
+          </span>
+        )}
       </button>
       {error && <p className="text-xs text-error w-full">{error}</p>}
     </form>

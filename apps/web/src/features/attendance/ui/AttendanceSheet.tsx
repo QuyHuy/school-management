@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CheckCircle2, Clock, Save, XCircle } from "lucide-react";
 import { markAttendanceApi } from "../api/attendance.api";
 import type { AttendanceRecord, AttendanceRecordIn, AttendanceStatus } from "../model/types";
 import type { Enrollment } from "@/src/features/classes/model/types";
@@ -19,6 +20,12 @@ const STATUS_LABELS: Record<AttendanceStatus, string> = {
   present: "Có mặt",
   absent: "Vắng",
   late: "Trễ",
+};
+
+const STATUS_ICONS: Record<AttendanceStatus, JSX.Element> = {
+  present: <CheckCircle2 className="w-4 h-4" />,
+  absent: <XCircle className="w-4 h-4" />,
+  late: <Clock className="w-4 h-4" />,
 };
 
 const STATUS_STYLES: Record<AttendanceStatus, string> = {
@@ -101,12 +108,13 @@ export function AttendanceSheet({
                   <button
                     key={s}
                     onClick={() => toggle(e.student_id, s)}
-                    className={`px-3 py-1 text-xs font-semibold rounded-sm border transition-colors ${
+                    className={`flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-sm border transition-colors ${
                       current === s
                         ? STATUS_STYLES[s]
                         : "bg-canvas text-ash border-border hover:border-ink"
                     }`}
                   >
+                    {STATUS_ICONS[s]}
                     {STATUS_LABELS[s]}
                   </button>
                 ))}
@@ -121,7 +129,14 @@ export function AttendanceSheet({
           disabled={saving}
           className="px-4 py-2 text-sm font-semibold text-white bg-primary rounded-sm hover:bg-primary-hover disabled:opacity-50 transition-colors"
         >
-          {saving ? "Đang lưu..." : "Lưu điểm danh"}
+          {saving ? (
+            "Đang lưu..."
+          ) : (
+            <span className="flex items-center gap-1.5">
+              <Save className="w-4 h-4" />
+              Lưu điểm danh
+            </span>
+          )}
         </button>
       </div>
     </div>

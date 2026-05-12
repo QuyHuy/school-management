@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { UserMinus, UserPlus } from "lucide-react";
 import {
   enrollStudentApi,
   listEnrollmentsApi,
@@ -110,8 +111,10 @@ export function EnrollmentSection({ classId, classGrade }: Props) {
                     </div>
                     <button
                       onClick={() => handleUnenroll(e.student_id)}
-                      className="text-xs text-error hover:underline"
+                      className="flex items-center gap-1.5 text-xs text-error hover:text-error/80 transition-colors"
+                      title="Xoá khỏi lớp"
                     >
+                      <UserMinus className="w-4 h-4" />
                       Xoá khỏi lớp
                     </button>
                   </li>
@@ -138,7 +141,14 @@ export function EnrollmentSection({ classId, classGrade }: Props) {
                 disabled={enrolling}
                 className="rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover transition-colors disabled:opacity-50"
               >
-                {enrolling ? "..." : "+ Thêm"}
+                {enrolling ? (
+                  "..."
+                ) : (
+                  <span className="flex items-center gap-1.5">
+                    <UserPlus className="w-4 h-4" />
+                    Thêm
+                  </span>
+                )}
               </button>
             </div>
           ) : (
