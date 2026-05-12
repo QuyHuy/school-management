@@ -129,3 +129,42 @@ class SQLAttendanceRepository(IAttendanceRepository):
             .order_by(AttendanceRecordModel.marked_at)
         )
         return [_record_to_domain(r) for r in result.scalars()]
+
+    async def update_session_notes(self, session_id: UUID, class_id: UUID, notes: str | None) -> ClassSession | None:
+        result = await self._session.execute(
+            select(ClassSessionModel).where(
+                ClassSessionModel.id == session_id,
+                ClassSessionModel.class_id == class_id,
+            )
+        )
+        row = result.scalar_one_or_none()
+        if not row:
+            return None
+        row.notes = notes
+        await self._session.flush()
+        await self._session.refresh(row)
+        return _session_to_domain(row)
+
+    async def list_sessions_in_month(self, class_ids: list[UUID], start: date, end: date) -> list[ClassSession]:
+        if not class_ids:
+            return []
+        result = await self._session.execute(
+            select(ClassSessionModel)
+            .where(
+                ClassSessionModel.class_id.in_(class_ids),
+                ClassSessionModel.date >= start,
+                ClassSessionModel.date <= end,
+            )
+            .order_by(ClassSessionModel.date)
+        )
+        return [_session_to_domain(r) for r in result.scalars()]
+
+    async def session_ids_with_attendance(self, session_ids: list[UUID]) -> set[UUID]:
+        if not session_ids:
+            return set()
+        result = await self._session.execute(
+            select(AttendanceRecordModel.session_id).distinct().where(
+                AttendanceRecordModel.session_id.in_(session_ids)
+            )
+        )
+        return {row for row in result.scalars()}
