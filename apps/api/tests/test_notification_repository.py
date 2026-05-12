@@ -1,10 +1,10 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from app.domain.repositories.notification_repository import Feedback, Notification
+from app.domain.repositories.notification_repository import Notification
 from app.infrastructure.db.repositories.notification_repository import (
     SQLFeedbackRepository,
     SQLNotificationRepository,
@@ -13,7 +13,7 @@ from app.infrastructure.db.repositories.notification_repository import (
 _ORG = uuid.UUID("00000000-0000-0000-0000-000000000002")
 _SENDER = uuid.UUID("00000000-0000-0000-0000-000000000001")
 _RECIPIENT = uuid.UUID("00000000-0000-0000-0000-000000000003")
-_NOW = datetime(2026, 5, 11, tzinfo=timezone.utc)
+_NOW = datetime(2026, 5, 11, tzinfo=UTC)
 
 
 def _make_notif_model(**kwargs):
@@ -63,7 +63,7 @@ async def test_notification_repo_create():
         id=notif_model.id, organization_id=_ORG, sender_id=_SENDER,
         recipient_id=_RECIPIENT, student_id=None, session_id=None,
         content="Test content", read_at=None, created_at=_NOW,
-    )) as mock_create:
+    )):
         result = await repo.create(_ORG, _SENDER, _RECIPIENT, None, "Test content", None)
 
     assert result.content == "Test content"

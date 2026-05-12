@@ -23,10 +23,7 @@ class GetSettingsUseCase:
             raise NotFoundError("Organization", str(org_id))
 
         token = org.zalo_oa_token_encrypted
-        if token and len(token) >= 4:
-            masked = f"{'*' * (len(token) - 4)}{token[-4:]}"
-        else:
-            masked = token
+        masked = f"{'*' * (len(token) - 4)}{token[-4:]}" if token and len(token) >= 4 else token
 
         return OrgSettings(
             name=org.name,

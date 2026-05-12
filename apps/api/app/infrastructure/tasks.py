@@ -14,4 +14,4 @@ def send_zalo_message(self, zalo_user_id: str, text: str, access_token: str) -> 
     try:
         asyncio.run(_run())
     except Exception as exc:
-        raise self.retry(exc=exc, countdown=60)
+        raise self.retry(exc=exc, countdown=60) from exc

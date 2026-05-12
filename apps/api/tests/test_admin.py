@@ -1,3 +1,4 @@
+import datetime as _dt
 import uuid
 from unittest.mock import AsyncMock, patch
 
@@ -13,9 +14,7 @@ _ADMIN_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
 _TEACHER_ID = uuid.UUID("00000000-0000-0000-0000-000000000003")
 
 _ADMIN_TOKEN = TokenData(user_id=_ADMIN_ID, org_id=_ORG_ID, role="admin", jti="j", exp=9999999999)
-
-import datetime as _dt
-_NOW = _dt.datetime(2026, 1, 1, tzinfo=_dt.timezone.utc)
+_NOW = _dt.datetime(2026, 1, 1, tzinfo=_dt.UTC)
 
 _TEACHER_INFO = TeacherInfo(
     id=_TEACHER_ID, name="Nguyễn Văn A", email="a@test.com", phone=None,

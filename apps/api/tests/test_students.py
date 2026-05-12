@@ -1,3 +1,4 @@
+import datetime as _dt
 import uuid
 from unittest.mock import AsyncMock, patch
 
@@ -13,9 +14,7 @@ _TEACHER_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
 _STUDENT_ID = uuid.UUID("00000000-0000-0000-0000-000000000003")
 
 _TOKEN = TokenData(user_id=_TEACHER_ID, org_id=_ORG_ID, role="teacher", jti="j", exp=9999999999)
-
-import datetime as _dt
-_NOW = _dt.datetime(2026, 1, 1, tzinfo=_dt.timezone.utc)
+_NOW = _dt.datetime(2026, 1, 1, tzinfo=_dt.UTC)
 
 _STUDENT = Student(
     id=_STUDENT_ID,
@@ -141,7 +140,6 @@ async def test_get_student(client: AsyncClient):
 
 
 async def test_list_student_classes(client: AsyncClient):
-    import datetime as _dt
     from app.domain.entities.class_ import Class
     _CLASS_ID = uuid.UUID("00000000-0000-0000-0000-000000000010")
     _class = Class(
