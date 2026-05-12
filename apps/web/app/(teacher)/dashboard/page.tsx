@@ -1,128 +1,147 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { getDashboardApi } from "@/src/features/dashboard/api/dashboard.api";
-import type { DashboardSummary } from "@/src/features/dashboard/model/types";
+import { useRouter } from "next/navigation";
+import { getCalendarApi } from "@/src/features/calendar/api/calendar.api";
+import { createSessionApi } from "@/src/features/attendance/api/attendance.api";
+import { CalendarGrid } from "@/src/features/calendar/ui/CalendarGrid";
+import { CreateSessionModal } from "@/src/features/calendar/ui/CreateSessionModal";
+import type { CalendarData, CalendarSession, CalendarSlot } from "@/src/features/calendar/model/types";
 
-function formatTime(t: string) {
-  const [h, m] = t.split(":");
-  return `${h}:${m}`;
+function monthLabel(year: number, month: number) {
+  return `Tháng ${month}, ${year}`;
 }
 
-function formatDate(d: string) {
-  const dt = new Date(d + "T00:00:00");
-  return `${dt.getDate()}/${dt.getMonth() + 1}/${dt.getFullYear()}`;
+function toMonthStr(year: number, month: number) {
+  return `${year}-${String(month).padStart(2, "0")}`;
 }
 
-const DAY_NAMES = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"];
-
-export default function TeacherDashboard() {
-  const [data, setData] = useState<DashboardSummary | null>(null);
+export default function CalendarPage() {
+  const router = useRouter();
+  const now = new Date();
+  const [year, setYear] = useState(now.getFullYear());
+  const [month, setMonth] = useState(now.getMonth() + 1);
+  const [data, setData] = useState<CalendarData>({ sessions: [], schedule_slots: [] });
   const [loading, setLoading] = useState(true);
-  const todayName = DAY_NAMES[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
+  const [loadingSlot, setLoadingSlot] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    getDashboardApi()
+    setLoading(true);
+    getCalendarApi(toMonthStr(year, month))
       .then(setData)
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [year, month]);
+
+  function prevMonth() {
+    if (month === 1) { setYear(y => y - 1); setMonth(12); }
+    else setMonth(m => m - 1);
+  }
+
+  function nextMonth() {
+    if (month === 12) { setYear(y => y + 1); setMonth(1); }
+    else setMonth(m => m + 1);
+  }
+
+  function goToday() {
+    const n = new Date();
+    setYear(n.getFullYear());
+    setMonth(n.getMonth() + 1);
+  }
+
+  function handleSessionClick(session: CalendarSession) {
+    router.push(`/classes/${session.class_id}/sessions/${session.id}`);
+  }
+
+  async function handleSlotClick(slot: CalendarSlot) {
+    const key = `${slot.class_id}|${slot.date}`;
+    setLoadingSlot(key);
+    try {
+      const session = await createSessionApi(slot.class_id, slot.date);
+      router.push(`/classes/${slot.class_id}/sessions/${session.id}`);
+    } catch {
+      setLoadingSlot(null);
+    }
+  }
+
+  function handleModalCreated(classId: string, sessionId: string) {
+    setShowModal(false);
+    router.push(`/classes/${classId}/sessions/${sessionId}`);
+  }
 
   return (
-    <div className="max-w-4xl flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold text-ink tracking-tight">Xin chào</h1>
-        <p className="text-ash text-sm mt-1">Chào mừng trở lại EduManager.</p>
+    <div className="max-w-5xl">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={prevMonth}
+            className="rounded-sm border border-border bg-canvas px-3 py-1.5 text-sm font-semibold text-ink hover:bg-surface transition-colors"
+          >
+            ◀
+          </button>
+          <span className="text-base font-bold text-ink tracking-tight min-w-[140px] text-center">
+            {monthLabel(year, month)}
+          </span>
+          <button
+            onClick={nextMonth}
+            className="rounded-sm border border-border bg-canvas px-3 py-1.5 text-sm font-semibold text-ink hover:bg-surface transition-colors"
+          >
+            ▶
+          </button>
+          <button
+            onClick={goToday}
+            className="rounded-sm border border-border bg-surface px-3 py-1.5 text-sm font-semibold text-ash hover:text-ink transition-colors"
+          >
+            Hôm nay
+          </button>
+        </div>
+        <button
+          onClick={() => setShowModal(true)}
+          className="rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-canvas hover:bg-primary-hover transition-colors"
+        >
+          + Tạo buổi học
+        </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-md border border-border bg-canvas p-5">
-          <p className="text-xs font-semibold text-ash uppercase tracking-wide mb-1">Lớp đang dạy</p>
-          {loading ? (
-            <div className="h-8 w-12 bg-stone/30 rounded animate-pulse" />
-          ) : (
-            <p className="text-3xl font-bold text-ink">{data?.active_classes_count ?? 0}</p>
-          )}
+      {/* Legend */}
+      <div className="flex gap-4 mb-4 flex-wrap">
+        <div className="flex items-center gap-1.5 text-xs text-ash">
+          <div className="w-3 h-3 rounded-[2px] bg-surface border-l-2 border-stone" />
+          Lịch chưa mở (click để tạo)
         </div>
-        <div className="rounded-md border border-border bg-canvas p-5">
-          <p className="text-xs font-semibold text-ash uppercase tracking-wide mb-1">Tổng học sinh</p>
-          {loading ? (
-            <div className="h-8 w-12 bg-stone/30 rounded animate-pulse" />
-          ) : (
-            <p className="text-3xl font-bold text-ink">{data?.total_students_count ?? 0}</p>
-          )}
+        <div className="flex items-center gap-1.5 text-xs text-ash">
+          <div className="w-3 h-3 rounded-[2px] bg-success/8 border-l-2 border-success" />
+          Đã điểm danh ✓
+        </div>
+        <div className="flex items-center gap-1.5 text-xs text-ash">
+          <div className="w-3 h-3 rounded-[2px] bg-error/8 border-l-2 border-error" />
+          Chưa điểm danh !
         </div>
       </div>
 
-      <section className="rounded-md border border-border bg-canvas p-5">
-        <h2 className="font-semibold text-ink mb-4">Lịch hôm nay — {todayName}</h2>
-        {loading ? (
-          <div className="space-y-2">
-            <div className="h-14 bg-stone/20 rounded animate-pulse" />
-            <div className="h-14 bg-stone/20 rounded animate-pulse" />
-          </div>
-        ) : data?.today_schedule.length === 0 ? (
-          <p className="text-sm text-ash py-4 text-center">Không có lớp nào hôm nay.</p>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {data?.today_schedule.map((c) => (
-              <Link
-                key={c.class_id}
-                href={`/classes/${c.class_id}`}
-                className="group flex items-center justify-between rounded-sm border border-border bg-surface px-4 py-3 hover:border-ink transition-colors"
-              >
-                <div>
-                  <p className="text-sm font-semibold text-ink group-hover:text-primary transition-colors">
-                    {c.class_name}
-                  </p>
-                  <p className="text-xs text-ash">{c.subject}</p>
-                </div>
-                <p className="text-sm font-medium text-ash shrink-0">
-                  {formatTime(c.start_time)} – {formatTime(c.end_time)}
-                </p>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {!loading && (data?.pending_sessions.length ?? 0) > 0 && (
-        <section className="rounded-md border border-error/20 bg-error/5 p-5">
-          <h2 className="font-semibold text-error mb-3 text-sm">
-            Chưa điểm danh ({data!.pending_sessions.length} buổi)
-          </h2>
-          <div className="flex flex-col gap-2">
-            {data!.pending_sessions.map((s) => (
-              <Link
-                key={s.session_id}
-                href={`/classes/${s.class_id}`}
-                className="flex items-center justify-between rounded-sm border border-error/10 bg-canvas px-4 py-2.5 hover:border-error/30 transition-colors"
-              >
-                <p className="text-sm font-medium text-ink">{s.class_name}</p>
-                <p className="text-xs text-ash">{formatDate(s.date)}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
+      {/* Calendar */}
+      {loading ? (
+        <div className="h-96 bg-stone/10 rounded-md animate-pulse" />
+      ) : (
+        <CalendarGrid
+          year={year}
+          month={month}
+          sessions={data.sessions}
+          slots={data.schedule_slots}
+          loadingSlot={loadingSlot}
+          onSessionClick={handleSessionClick}
+          onSlotClick={handleSlotClick}
+        />
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Link
-          href="/classes"
-          className="group rounded-md border border-border bg-canvas p-5 hover:border-ink hover:shadow-card transition-all"
-        >
-          <p className="text-sm font-semibold text-ink mb-1">Quản lý lớp học</p>
-          <p className="text-xs text-ash">Lịch, danh sách, điểm số</p>
-        </Link>
-        <Link
-          href="/students"
-          className="group rounded-md border border-border bg-canvas p-5 hover:border-ink hover:shadow-card transition-all"
-        >
-          <p className="text-sm font-semibold text-ink mb-1">Quản lý học sinh</p>
-          <p className="text-xs text-ash">Hồ sơ và danh sách lớp</p>
-        </Link>
-      </div>
+      {showModal && (
+        <CreateSessionModal
+          onCreated={handleModalCreated}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 }

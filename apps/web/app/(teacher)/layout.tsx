@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useAuthStore } from "@/src/features/auth/model/store";
 
 const NAV = [
-  { href: "/dashboard", label: "Dashboard", icon: "⊞" },
+  { href: "/dashboard", label: "Lịch dạy", icon: "⊞" },
   { href: "/classes", label: "Lớp học", icon: "📚" },
   { href: "/students", label: "Học sinh", icon: "👤" },
   { href: "/feedback", label: "Phản hồi PH", icon: "💬" },
