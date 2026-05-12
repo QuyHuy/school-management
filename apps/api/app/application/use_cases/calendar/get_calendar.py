@@ -38,14 +38,17 @@ class GetCalendarUseCase:
             [c.id for c in classes], start, end
         )
         session_map = {(s.class_id, s.date): s for s in sessions_in_month}
-        attended_ids = await self._att_repo.session_ids_with_attendance(
-            [s.id for s in sessions_in_month]
-        )
+        attended_ids: set[UUID] = set()
+        if sessions_in_month:
+            attended_ids = await self._att_repo.session_ids_with_attendance(
+                [s.id for s in sessions_in_month]
+            )
 
         sessions_out: list[CalendarSession] = []
         slots_out: list[CalendarSlot] = []
         scheduled_session_ids: set[UUID] = set()
 
+        # N+1: one query per class for schedules. Acceptable since teachers have <10 classes.
         for class_ in classes:
             schedules = await self._class_repo.list_schedules(class_.id)
             for schedule in schedules:
