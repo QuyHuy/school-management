@@ -15,6 +15,7 @@ import type { Student } from "@/src/features/students/model/types";
 interface Props {
   classId: string;
   students: Student[];
+  filterDate?: string; // "YYYY-MM-DD" — if provided, only show exams with exam_date matching this
 }
 
 function formatExamDate(d: string | null) {
@@ -30,7 +31,16 @@ const EXAM_TYPE_OPTIONS: { value: ExamType; label: string }[] = [
   { value: "assignment", label: "Bài tập" },
 ];
 
-export function ExamSection({ classId, students }: Props) {
+const WEIGHT_LABEL: Record<string, string> = {
+  quiz: "×1",
+  midterm: "×2",
+  final: "×3",
+  assignment: "—",
+};
+
+const EXAM_WEIGHT: Record<string, number> = { quiz: 1, midterm: 2, final: 3 };
+
+export function ExamSection({ classId, students, filterDate }: Props) {
   const [exams, setExams] = useState<Exam[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -41,7 +51,6 @@ export function ExamSection({ classId, students }: Props) {
   const [title, setTitle] = useState("");
   const [type, setType] = useState<ExamType>("quiz");
   const [maxScore, setMaxScore] = useState("10");
-  const [weightPercent, setWeightPercent] = useState("10");
   const [examDate, setExamDate] = useState("");
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -51,6 +60,10 @@ export function ExamSection({ classId, students }: Props) {
       .then(setExams)
       .finally(() => setLoading(false));
   }, [classId]);
+
+  const visibleExams = filterDate
+    ? exams.filter((e) => e.exam_date === filterDate)
+    : exams;
 
   async function handleExpand(exam: Exam) {
     if (expandedId === exam.id) {
@@ -73,21 +86,19 @@ export function ExamSection({ classId, students }: Props) {
     e.preventDefault();
     setCreateError(null);
     const ms = parseFloat(maxScore);
-    const wp = parseInt(weightPercent, 10);
     if (isNaN(ms) || ms <= 0) { setCreateError("Điểm tối đa phải lớn hơn 0."); return; }
-    if (isNaN(wp) || wp < 0 || wp > 100) { setCreateError("Hệ số phải từ 0 đến 100."); return; }
     setCreating(true);
     try {
       const body: CreateExamRequest = {
         title: title.trim(),
         type,
         max_score: ms,
-        weight_percent: wp,
+        weight_percent: EXAM_WEIGHT[type] ?? 0,
         exam_date: examDate || null,
       };
       const exam = await createExamApi(classId, body);
       setExams((prev) => [...prev, exam]);
-      setTitle(""); setMaxScore("10"); setWeightPercent("10"); setExamDate("");
+      setTitle(""); setMaxScore("10"); setExamDate("");
       setShowCreate(false);
     } catch {
       setCreateError("Không thể tạo bài kiểm tra.");
@@ -117,11 +128,13 @@ export function ExamSection({ classId, students }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      {exams.length === 0 && !showCreate ? (
-        <p className="text-sm text-ash">Chưa có bài kiểm tra nào.</p>
+      {visibleExams.length === 0 && !showCreate ? (
+        <p className="text-sm text-ash">
+          {filterDate ? "Chưa có bài kiểm tra nào trong buổi học này." : "Chưa có bài kiểm tra nào."}
+        </p>
       ) : (
         <div className="flex flex-col gap-2">
-          {exams.map((exam) => {
+          {visibleExams.map((exam) => {
             const grades = gradesCache[exam.id] ?? [];
             const gradedCount = grades.length;
             const avg =
@@ -137,7 +150,12 @@ export function ExamSection({ classId, students }: Props) {
                     className="flex-1 flex items-center gap-3 text-left"
                   >
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-ink">{exam.title}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-semibold text-ink">{exam.title}</p>
+                        <span className="text-xs font-bold text-ink bg-surface border border-border rounded-full px-2 py-0.5">
+                          {WEIGHT_LABEL[exam.type] ?? "—"}
+                        </span>
+                      </div>
                       <p className="text-xs text-ash mt-0.5">
                         {EXAM_TYPE_LABELS[exam.type]}
                         {exam.exam_date ? ` · ${formatExamDate(exam.exam_date)}` : ""}
@@ -228,29 +246,21 @@ export function ExamSection({ classId, students }: Props) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1.5">
-              <label className={labelCls}>Điểm tối đa *</label>
-              <input
-                type="number"
-                min={0.5}
-                step={0.5}
-                value={maxScore}
-                onChange={(e) => setMaxScore(e.target.value)}
-                className={inputCls}
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className={labelCls}>Hệ số (%)</label>
-              <input
-                type="number"
-                min={0}
-                max={100}
-                value={weightPercent}
-                onChange={(e) => setWeightPercent(e.target.value)}
-                className={inputCls}
-              />
-            </div>
+          <div className="flex flex-col gap-1.5">
+            <label className={labelCls}>Điểm tối đa *</label>
+            <input
+              type="number"
+              min={0.5}
+              step={0.5}
+              value={maxScore}
+              onChange={(e) => setMaxScore(e.target.value)}
+              className={inputCls}
+            />
+          </div>
+
+          <div className="rounded-sm bg-surface border border-border px-3 py-2 text-xs text-ash">
+            Hệ số: <strong className="text-ink">{WEIGHT_LABEL[type] ?? "—"}</strong>
+            {type === "assignment" && " · Không tính vào điểm TB môn"}
           </div>
 
           {createError && <p className="text-sm text-error">{createError}</p>}
