@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { BookOpen, Plus } from "lucide-react";
 import { ClassCard } from "@/src/features/classes/ui/ClassCard";
 import { listClassesApi } from "@/src/features/classes/api/classes.api";
 import type { Class } from "@/src/features/classes/model/types";
@@ -22,16 +23,22 @@ export default function ClassesPage() {
     <div className="max-w-3xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-ink tracking-tight">Lớp học</h1>
-          {!loading && !error && (
-            <p className="text-ash text-sm mt-0.5">{classes.length} lớp</p>
-          )}
+          <div className="flex items-center gap-2 mb-1">
+            <BookOpen className="w-5 h-5 text-primary" />
+            <h1 className="text-2xl font-bold text-ink tracking-tight">Lớp học</h1>
+          </div>
+          <p className="text-sm text-ash">
+            {!loading && !error
+              ? `${classes.length} lớp đang quản lý`
+              : "Quản lý danh sách lớp học"}
+          </p>
         </div>
         <Link
           href="/classes/new"
-          className="rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-hover transition-colors shadow-sm"
+          className="flex items-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-canvas hover:bg-primary-hover transition-colors"
         >
-          + Tạo lớp
+          <Plus className="w-4 h-4" />
+          Tạo lớp
         </Link>
       </div>
 
@@ -56,9 +63,10 @@ export default function ClassesPage() {
           <p className="text-ash text-sm mt-1 mb-4">Tạo lớp học đầu tiên để bắt đầu</p>
           <Link
             href="/classes/new"
-            className="inline-block rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover transition-colors"
+            className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-canvas hover:bg-primary-hover transition-colors"
           >
-            + Tạo lớp đầu tiên
+            <Plus className="w-4 h-4" />
+            Tạo lớp đầu tiên
           </Link>
         </div>
       )}

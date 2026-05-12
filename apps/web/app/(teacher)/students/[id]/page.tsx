@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 import { getStudentApi, listStudentClassesApi } from "@/src/features/students/api/students.api";
 import type { Student } from "@/src/features/students/model/types";
 import type { Class } from "@/src/features/classes/model/types";
@@ -46,7 +47,10 @@ export default function StudentDetailPage() {
   if (error || !student) {
     return (
       <div className="max-w-2xl">
-        <Link href="/students" className="text-sm text-ash hover:text-ink">← Danh sách học sinh</Link>
+        <Link href="/students" className="flex items-center gap-1.5 text-sm text-ash hover:text-ink transition-colors">
+          <ArrowLeft className="w-4 h-4" />
+          Danh sách học sinh
+        </Link>
         <div className="mt-4 rounded-md border border-error/20 bg-error/5 px-4 py-3 text-sm text-error">
           {error ?? "Không tìm thấy học sinh."}
         </div>
@@ -60,8 +64,9 @@ export default function StudentDetailPage() {
     <div className="max-w-2xl flex flex-col gap-6">
       {/* Breadcrumb */}
       <div>
-        <Link href="/students" className="text-sm text-ash hover:text-ink transition-colors">
-          ← Danh sách học sinh
+        <Link href="/students" className="flex items-center gap-1.5 text-sm text-ash hover:text-ink transition-colors">
+          <ArrowLeft className="w-4 h-4" />
+          Danh sách học sinh
         </Link>
       </div>
 
@@ -147,7 +152,7 @@ export default function StudentDetailPage() {
               <Link
                 key={c.id}
                 href={`/classes/${c.id}`}
-                className="group flex items-center justify-between rounded-sm border border-border bg-surface px-4 py-3 hover:border-ink transition-colors"
+                className="group flex items-center justify-between rounded-sm border border-border bg-surface px-4 py-3 hover:border-stone transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-sm bg-primary/8 flex items-center justify-center shrink-0">
@@ -164,15 +169,15 @@ export default function StudentDetailPage() {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   {c.is_active ? (
-                    <span className="text-xs font-semibold text-success bg-success/10 rounded-full px-2.5 py-0.5">
+                    <span className="text-xs font-semibold text-success bg-success/8 rounded-full px-2.5 py-0.5 border border-success/15">
                       Đang học
                     </span>
                   ) : (
-                    <span className="text-xs font-semibold text-ash bg-surface rounded-full px-2.5 py-0.5">
+                    <span className="text-xs font-semibold text-ash bg-canvas rounded-full px-2.5 py-0.5 border border-border">
                       Kết thúc
                     </span>
                   )}
-                  <span className="text-stone text-sm">→</span>
+                  <ChevronRight className="w-4 h-4 text-stone group-hover:text-ash transition-colors" />
                 </div>
               </Link>
             ))}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { MessageSquare } from "lucide-react";
 import {
   listFeedbackApi,
   replyFeedbackApi,
@@ -52,7 +53,7 @@ export default function TeacherFeedbackPage() {
 
   if (loading) {
     return (
-      <div className="p-6 flex flex-col gap-3">
+      <div className="max-w-3xl flex flex-col gap-3">
         {[1, 2, 3].map((i) => (
           <div key={i} className="h-32 bg-stone/20 rounded-md animate-pulse" />
         ))}
@@ -61,12 +62,19 @@ export default function TeacherFeedbackPage() {
   }
 
   return (
-    <div className="p-6 flex flex-col gap-4">
-      <h1 className="text-2xl font-bold text-ink">Hộp thư phản hồi</h1>
-      <p className="text-sm text-ash">{items.length} phản hồi từ phụ huynh</p>
+    <div className="max-w-3xl flex flex-col gap-4">
+      <div className="flex items-center justify-between mb-2">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <MessageSquare className="w-5 h-5 text-primary" />
+            <h1 className="text-2xl font-bold text-ink tracking-tight">Hộp thư phản hồi</h1>
+          </div>
+          <p className="text-sm text-ash">{items.length} phản hồi từ phụ huynh</p>
+        </div>
+      </div>
 
       {toast && (
-        <div className="fixed top-4 right-4 z-50 rounded-md bg-primary px-4 py-2 text-sm text-white shadow-lg">
+        <div className="fixed top-4 right-4 z-50 rounded-md bg-primary px-4 py-2 text-sm text-canvas shadow-lg">
           {toast}
         </div>
       )}
@@ -104,7 +112,7 @@ export default function TeacherFeedbackPage() {
                   <button
                     onClick={() => handleReply(fb.id)}
                     disabled={submitting === fb.id || !replyContent[fb.id]?.trim()}
-                    className="self-end rounded-md bg-primary px-4 py-2 text-sm font-medium text-white disabled:opacity-50 transition-colors"
+                    className="self-end flex items-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-canvas hover:bg-primary-hover transition-colors disabled:opacity-50"
                   >
                     {submitting === fb.id ? "Đang gửi..." : "Gửi trả lời"}
                   </button>

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { Users, Plus, ChevronRight } from "lucide-react";
 import { listStudentsApi } from "@/src/features/students/api/students.api";
 import type { Student } from "@/src/features/students/model/types";
 
@@ -38,16 +39,22 @@ export default function StudentsPage() {
     <div className="max-w-3xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-ink tracking-tight">Học sinh</h1>
-          {!loading && !error && (
-            <p className="text-ash text-sm mt-0.5">{students.length} học sinh</p>
-          )}
+          <div className="flex items-center gap-2 mb-1">
+            <Users className="w-5 h-5 text-primary" />
+            <h1 className="text-2xl font-bold text-ink tracking-tight">Học sinh</h1>
+          </div>
+          <p className="text-sm text-ash">
+            {!loading && !error
+              ? `${students.length} học sinh đang quản lý`
+              : "Quản lý danh sách học sinh"}
+          </p>
         </div>
         <Link
           href="/students/new"
-          className="rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-hover transition-colors shadow-sm"
+          className="flex items-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-canvas hover:bg-primary-hover transition-colors"
         >
-          + Thêm học sinh
+          <Plus className="w-4 h-4" />
+          Thêm học sinh
         </Link>
       </div>
 
@@ -84,9 +91,10 @@ export default function StudentsPage() {
           <p className="text-ash text-sm mt-1 mb-4">Thêm học sinh đầu tiên để bắt đầu</p>
           <Link
             href="/students/new"
-            className="inline-block rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover transition-colors"
+            className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-canvas hover:bg-primary-hover transition-colors"
           >
-            + Thêm học sinh
+            <Plus className="w-4 h-4" />
+            Thêm học sinh
           </Link>
         </div>
       )}
@@ -100,7 +108,7 @@ export default function StudentsPage() {
           <Link
             key={s.id}
             href={`/students/${s.id}`}
-            className="group flex items-center justify-between rounded-md border border-border bg-canvas px-5 py-4 hover:border-ink hover:shadow-card transition-all"
+            className="group flex items-center justify-between rounded-md border border-border bg-canvas px-5 py-4 hover:border-stone hover:shadow-card transition-all"
           >
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-full bg-primary/8 flex items-center justify-center shrink-0">
@@ -110,7 +118,7 @@ export default function StudentsPage() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-ink group-hover:text-primary transition-colors">
+                  <h3 className="font-semibold text-ink group-hover:text-primary transition-colors text-sm">
                     {s.name}
                   </h3>
                   {s.student_code && (
@@ -119,7 +127,7 @@ export default function StudentsPage() {
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-ash mt-0.5">
+                <p className="text-xs text-ash mt-0.5">
                   {s.grade ? `Khối ${s.grade}` : ""}
                   {s.grade && s.date_of_birth ? " · " : ""}
                   {s.date_of_birth ? `${formatDob(s.date_of_birth)}` : ""}
@@ -127,7 +135,7 @@ export default function StudentsPage() {
                 </p>
               </div>
             </div>
-            <span className="text-stone text-lg shrink-0">→</span>
+            <ChevronRight className="w-4 h-4 text-stone group-hover:text-ash transition-colors shrink-0" />
           </Link>
         ))}
       </div>
