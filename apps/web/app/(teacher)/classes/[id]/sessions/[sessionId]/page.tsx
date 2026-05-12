@@ -205,7 +205,7 @@ export default function SessionDetailPage() {
         <h2 className="text-sm font-semibold text-ink uppercase tracking-wide">
           Bài kiểm tra
         </h2>
-        <ExamSection classId={classId} students={enrolledStudents} />
+        <ExamSection classId={classId} students={enrolledStudents} filterDate={session.date} />
       </section>
     </div>
   );
