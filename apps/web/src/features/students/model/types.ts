@@ -39,3 +39,23 @@ export interface CreateStudentRequest {
   note?: string | null;
   parent?: ParentRequest | null;
 }
+
+export interface ImportPreviewRow {
+  row: number;
+  name: string;
+  grade: number | null;
+  date_of_birth: string | null;
+  note: string | null;
+  errors: string[];
+}
+
+export interface ImportPreviewResponse {
+  valid: ImportPreviewRow[];
+  invalid: ImportPreviewRow[];
+  total_rows: number;
+}
+
+export interface ImportConfirmResponse {
+  created: number;
+  failed: { row: number; error: string }[];
+}

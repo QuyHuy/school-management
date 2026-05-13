@@ -1,5 +1,5 @@
 import { apiClient } from "@/src/shared/api/client";
-import type { CheckParentResponse, CreateStudentRequest, Student } from "../model/types";
+import type { CheckParentResponse, CreateStudentRequest, ImportConfirmResponse, ImportPreviewResponse, ImportPreviewRow, Student } from "../model/types";
 
 export async function listStudentsApi(): Promise<Student[]> {
   const { data } = await apiClient.get<Student[]>("/students");
@@ -25,5 +25,31 @@ export async function checkParentPhoneApi(phone: string): Promise<CheckParentRes
   const { data } = await apiClient.get<CheckParentResponse>(
     `/students/check-parent?phone=${encodeURIComponent(phone)}`
   );
+  return data;
+}
+
+export async function downloadStudentTemplateApi(): Promise<void> {
+  const { data } = await apiClient.get("/students/import/template", {
+    responseType: "blob",
+  });
+  const url = URL.createObjectURL(data);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "students_template.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+export async function previewStudentImportApi(file: File): Promise<ImportPreviewResponse> {
+  const form = new FormData();
+  form.append("file", file);
+  const { data } = await apiClient.post<ImportPreviewResponse>("/students/import/preview", form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data;
+}
+
+export async function confirmStudentImportApi(rows: ImportPreviewRow[]): Promise<ImportConfirmResponse> {
+  const { data } = await apiClient.post<ImportConfirmResponse>("/students/import/confirm", { rows });
   return data;
 }
