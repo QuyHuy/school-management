@@ -102,6 +102,7 @@ async def preview_import(
     if not (file.filename or "").endswith(".csv"):
         raise HTTPException(status_code=400, detail="Chỉ chấp nhận file .csv")
     contents = await file.read()
+    await file.close()
     if len(contents) > 500 * 1024:
         raise HTTPException(status_code=400, detail="File quá lớn (tối đa 500KB)")
     uc = BulkImportStudentsUseCase(SQLStudentRepository(db), SQLUserRepository(db))
