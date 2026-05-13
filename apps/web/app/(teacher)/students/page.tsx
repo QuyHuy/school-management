@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Users, Plus, ChevronRight } from "lucide-react";
+import { Users, Plus, ChevronRight, Upload } from "lucide-react";
 import { listStudentsApi } from "@/src/features/students/api/students.api";
 import type { Student } from "@/src/features/students/model/types";
+import { ImportCSVModal } from "@/src/features/students/ui/ImportCSVModal";
 
 function formatDob(dob: string | null) {
   if (!dob) return "—";
@@ -17,13 +18,17 @@ export default function StudentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const [importOpen, setImportOpen] = useState(false);
 
-  useEffect(() => {
+  const fetchStudents = useCallback(() => {
+    setLoading(true);
     listStudentsApi()
       .then(setStudents)
       .catch(() => setError("Không thể tải danh sách học sinh."))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => { fetchStudents(); }, [fetchStudents]);
 
   const filtered = useMemo(
     () =>
@@ -37,6 +42,11 @@ export default function StudentsPage() {
 
   return (
     <div className="max-w-3xl">
+      <ImportCSVModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        onSuccess={fetchStudents}
+      />
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
@@ -49,13 +59,22 @@ export default function StudentsPage() {
               : "Quản lý danh sách học sinh"}
           </p>
         </div>
-        <Link
-          href="/students/new"
-          className="flex items-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-canvas hover:bg-primary-hover transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Thêm học sinh
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setImportOpen(true)}
+            className="flex items-center gap-2 rounded-sm border border-border bg-canvas px-4 py-2.5 text-sm font-semibold text-ink hover:bg-surface transition-colors"
+          >
+            <Upload className="w-4 h-4" />
+            Import CSV
+          </button>
+          <Link
+            href="/students/new"
+            className="flex items-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-sm font-semibold text-canvas hover:opacity-90 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Thêm học sinh
+          </Link>
+        </div>
       </div>
 
       {!loading && !error && students.length > 1 && (
