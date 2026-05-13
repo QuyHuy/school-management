@@ -18,9 +18,9 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.add_column("classes", sa.Column("grade", sa.SmallInteger(), nullable=True))
-    op.add_column("students", sa.Column("student_code", sa.String(length=50), nullable=True))
-    op.add_column("students", sa.Column("grade", sa.SmallInteger(), nullable=True))
+    op.execute("ALTER TABLE classes ADD COLUMN IF NOT EXISTS grade SMALLINT")
+    op.execute("ALTER TABLE students ADD COLUMN IF NOT EXISTS student_code VARCHAR(50)")
+    op.execute("ALTER TABLE students ADD COLUMN IF NOT EXISTS grade SMALLINT")
 
     # Revert e3a7f2b1c9d8: email was made nullable for parent phone login;
     # parents now have an email column populated, so NOT NULL is enforced again.
@@ -29,7 +29,10 @@ def upgrade() -> None:
 
     # Remove redundant unnamed unique constraint on zalo_bindings.user_id
     # (uniqueness is already enforced by unique index ix_zalo_bindings_user_id).
-    op.drop_constraint("zalo_bindings_user_id_key", "zalo_bindings", type_="unique")
+    # Use IF EXISTS to tolerate environments where it was already dropped.
+    op.execute(
+        "ALTER TABLE zalo_bindings DROP CONSTRAINT IF EXISTS zalo_bindings_user_id_key"
+    )
 
 
 def downgrade() -> None:
