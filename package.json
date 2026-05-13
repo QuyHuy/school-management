@@ -5,7 +5,8 @@
   "packageManager": "pnpm@9.11.0",
   "scripts": {
     "dev": "turbo run dev",
-    "build": "turbo run build",
+    "build": "pnpm --filter @school/web build",
+    "start": "pnpm --filter @school/web start",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "type-check": "turbo run type-check"
