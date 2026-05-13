@@ -64,3 +64,29 @@ class StudentResponse(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class ImportPreviewRow(BaseModel):
+    row: int
+    name: str
+    grade: int | None = None
+    date_of_birth: date | None = None
+    note: str | None = None
+    errors: list[str] = []
+
+    model_config = {"from_attributes": True}
+
+
+class ImportPreviewResponse(BaseModel):
+    valid: list[ImportPreviewRow]
+    invalid: list[ImportPreviewRow]
+    total_rows: int
+
+
+class ImportConfirmRequest(BaseModel):
+    rows: list[ImportPreviewRow]
+
+
+class ImportConfirmResponse(BaseModel):
+    created: int
+    failed: list[dict]
