@@ -7,7 +7,7 @@ import {
   downloadStudentTemplateApi,
   previewStudentImportApi,
 } from "../api/students.api";
-import type { ImportPreviewResponse, ImportPreviewRow } from "../model/types";
+import type { ImportPreviewResponse } from "../model/types";
 
 interface Props {
   open: boolean;

@@ -4,7 +4,10 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.application.use_cases.students.bulk_import_students import BulkImportStudentsUseCase, PreviewRow
+from app.application.use_cases.students.bulk_import_students import (
+    BulkImportStudentsUseCase,
+    PreviewRow,
+)
 from app.application.use_cases.students.create_student import CreateStudentUseCase, ParentInput
 from app.application.use_cases.students.get_student import GetStudentUseCase
 from app.application.use_cases.students.list_student_classes import ListStudentClassesUseCase

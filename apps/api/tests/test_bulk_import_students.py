@@ -1,6 +1,6 @@
-import io
 from datetime import date
 from unittest.mock import AsyncMock, patch
+
 import pytest
 
 from app.application.use_cases.students.bulk_import_students import (
@@ -122,10 +122,12 @@ async def test_confirm_skips_invalid_rows():
 
 @pytest.mark.asyncio
 async def test_template_endpoint():
-    from httpx import AsyncClient, ASGITransport
     from unittest.mock import MagicMock
-    from app.main import app as fastapi_app
+
+    from httpx import ASGITransport, AsyncClient
+
     import app.interfaces.api.v1.routers.students as students_router
+    from app.main import app as fastapi_app
 
     fake_token = MagicMock()
     fastapi_app.dependency_overrides[students_router._teacher_or_admin] = lambda: fake_token
