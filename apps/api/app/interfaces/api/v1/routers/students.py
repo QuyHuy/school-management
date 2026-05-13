@@ -1,8 +1,10 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.application.use_cases.students.bulk_import_students import BulkImportStudentsUseCase, PreviewRow
 from app.application.use_cases.students.create_student import CreateStudentUseCase, ParentInput
 from app.application.use_cases.students.get_student import GetStudentUseCase
 from app.application.use_cases.students.list_student_classes import ListStudentClassesUseCase
@@ -17,6 +19,10 @@ from app.interfaces.api.v1.schemas.class_ import ClassResponse
 from app.interfaces.api.v1.schemas.student import (
     CheckParentResponse,
     CreateStudentRequest,
+    ImportConfirmRequest,
+    ImportConfirmResponse,
+    ImportPreviewResponse,
+    ImportPreviewRow,
     ParentInfo,
     StudentResponse,
 )
@@ -68,6 +74,71 @@ async def check_parent_phone(
         name=user.name if is_parent else None,
         phone=user.phone if is_parent else None,
         email=user.email if is_parent else None,
+    )
+
+
+_TEMPLATE_CSV = (
+    "name,grade,date_of_birth,note\r\n"
+    "Nguyễn Văn An,5,2015-03-20,Học giỏi toán\r\n"
+    "Trần Thị Bình,3,,\r\n"
+)
+
+
+@router.get("/import/template")
+async def download_import_template(token=Depends(_teacher_or_admin)):
+    return StreamingResponse(
+        iter([_TEMPLATE_CSV]),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": "attachment; filename=\"students_template.csv\""},
+    )
+
+
+@router.post("/import/preview", response_model=ImportPreviewResponse)
+async def preview_import(
+    file: UploadFile,
+    token=Depends(_teacher_or_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    if not (file.filename or "").endswith(".csv"):
+        raise HTTPException(status_code=400, detail="Chỉ chấp nhận file .csv")
+    contents = await file.read()
+    if len(contents) > 500 * 1024:
+        raise HTTPException(status_code=400, detail="File quá lớn (tối đa 500KB)")
+    uc = BulkImportStudentsUseCase(SQLStudentRepository(db), SQLUserRepository(db))
+    result = await uc.preview(contents, token.org_id)
+    return ImportPreviewResponse(
+        valid=[_row_to_schema(r) for r in result.valid],
+        invalid=[_row_to_schema(r) for r in result.invalid],
+        total_rows=result.total_rows,
+    )
+
+
+@router.post("/import/confirm", response_model=ImportConfirmResponse)
+async def confirm_import(
+    body: ImportConfirmRequest,
+    token=Depends(_teacher_or_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    rows = [
+        PreviewRow(
+            row=r.row,
+            name=r.name,
+            grade=r.grade,
+            date_of_birth=r.date_of_birth,
+            note=r.note,
+            errors=[],
+        )
+        for r in body.rows
+    ]
+    uc = BulkImportStudentsUseCase(SQLStudentRepository(db), SQLUserRepository(db))
+    result = await uc.confirm(rows, token.org_id, token.user_id)
+    return ImportConfirmResponse(created=result.created, failed=result.failed)
+
+
+def _row_to_schema(r: PreviewRow) -> ImportPreviewRow:
+    return ImportPreviewRow(
+        row=r.row, name=r.name, grade=r.grade,
+        date_of_birth=r.date_of_birth, note=r.note, errors=r.errors,
     )
 
 
