@@ -95,3 +95,26 @@ async def test_confirm_creates_students():
     assert mock_instance.execute.call_count == 2
     assert result.created == 2
     assert result.failed == []
+
+
+@pytest.mark.asyncio
+async def test_confirm_skips_invalid_rows():
+    rows = [
+        PreviewRow(row=1, name="An", grade=5, date_of_birth=None, note=None, errors=[]),
+        PreviewRow(row=2, name="", grade=None, date_of_birth=None, note=None, errors=["Tên là bắt buộc"]),
+    ]
+    student_repo = AsyncMock()
+    user_repo = AsyncMock()
+    uc = BulkImportStudentsUseCase(student_repo=student_repo, user_repo=user_repo)
+
+    with patch(
+        "app.application.use_cases.students.bulk_import_students.CreateStudentUseCase"
+    ) as MockUC:
+        mock_instance = MockUC.return_value
+        mock_instance.execute = AsyncMock(return_value=AsyncMock())
+        result = await uc.confirm(rows, ORG, TEACHER)
+
+    assert mock_instance.execute.call_count == 1  # only valid row processed
+    assert result.created == 1
+    assert len(result.failed) == 1
+    assert result.failed[0]["row"] == 2

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import csv
 import io
-import uuid
 from dataclasses import dataclass, field
 from datetime import date
 from uuid import UUID
@@ -83,11 +82,14 @@ class BulkImportStudentsUseCase:
         uc = CreateStudentUseCase(self._student_repo, self._user_repo)
 
         for row in rows:
+            if row.errors:
+                failed.append({"row": row.row, "error": "Dòng có lỗi validation, bỏ qua"})
+                continue
             try:
                 await uc.execute(
                     org_id=org_id,
                     name=row.name,
-                    grade=row.grade or 1,
+                    grade=row.grade if row.grade is not None else 1,  # safety fallback
                     date_of_birth=row.date_of_birth,
                     note=row.note,
                     parent=None,
