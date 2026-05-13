@@ -56,13 +56,16 @@ class BulkImportStudentsUseCase:
                 errors.append("Tên là bắt buộc")
 
             grade: int | None = None
-            try:
-                grade = int(grade_raw)
-                if not 1 <= grade <= 12:
-                    errors.append("Khối phải từ 1 đến 12")
-                    grade = None
-            except ValueError:
-                errors.append("Khối phải là số nguyên (1–12)")
+            if not grade_raw:
+                errors.append("Khối là bắt buộc")
+            else:
+                try:
+                    grade = int(grade_raw)
+                    if not 1 <= grade <= 12:
+                        errors.append("Khối phải từ 1 đến 12")
+                        grade = None
+                except ValueError:
+                    errors.append("Khối phải là số nguyên (1–12)")
 
             dob: date | None = None
             if dob_raw:
@@ -85,11 +88,18 @@ class BulkImportStudentsUseCase:
             if row.errors:
                 failed.append({"row": row.row, "error": "Dòng có lỗi validation, bỏ qua"})
                 continue
+            # Server-side re-validation: don't trust client-supplied errors=[].
+            if not row.name or not row.name.strip():
+                failed.append({"row": row.row, "error": "Tên là bắt buộc"})
+                continue
+            if row.grade is None or not (1 <= row.grade <= 12):
+                failed.append({"row": row.row, "error": "Khối phải từ 1 đến 12"})
+                continue
             try:
                 await uc.execute(
                     org_id=org_id,
                     name=row.name,
-                    grade=row.grade if row.grade is not None else 1,  # safety fallback
+                    grade=row.grade,
                     date_of_birth=row.date_of_birth,
                     note=row.note,
                     parent=None,

@@ -37,15 +37,13 @@ export async function downloadStudentTemplateApi(): Promise<void> {
   a.href = url;
   a.download = "students_template.csv";
   a.click();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 100);
 }
 
 export async function previewStudentImportApi(file: File): Promise<ImportPreviewResponse> {
   const form = new FormData();
   form.append("file", file);
-  const { data } = await apiClient.post<ImportPreviewResponse>("/students/import/preview", form, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  const { data } = await apiClient.post<ImportPreviewResponse>("/students/import/preview", form);
   return data;
 }
 

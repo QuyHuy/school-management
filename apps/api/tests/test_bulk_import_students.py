@@ -123,18 +123,19 @@ async def test_confirm_skips_invalid_rows():
 @pytest.mark.asyncio
 async def test_template_endpoint():
     from httpx import AsyncClient, ASGITransport
+    from unittest.mock import MagicMock
     from app.main import app as fastapi_app
+    import app.interfaces.api.v1.routers.students as students_router
+
+    fake_token = MagicMock()
+    fastapi_app.dependency_overrides[students_router._teacher_or_admin] = lambda: fake_token
 
     transport = ASGITransport(app=fastapi_app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        login = await client.post("/api/v1/auth/login", json={
-            "email": "admin@gmail.com", "password": "password123"
-        })
-        token = login.json().get("access_token", "fake-token")
-        resp = await client.get(
-            "/api/v1/students/import/template",
-            headers={"Authorization": f"Bearer {token}"},
-        )
-    assert resp.status_code == 200
-    assert "text/csv" in resp.headers["content-type"]
-    assert "name,grade,date_of_birth,note" in resp.text
+    try:
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            resp = await client.get("/api/v1/students/import/template")
+        assert resp.status_code == 200
+        assert "text/csv" in resp.headers["content-type"]
+        assert "name,grade,date_of_birth,note" in resp.text
+    finally:
+        fastapi_app.dependency_overrides.clear()
