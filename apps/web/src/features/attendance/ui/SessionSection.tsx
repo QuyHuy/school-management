@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   createSessionApi,
+  bulkCreateSessionsApi,
   listAttendanceApi,
   listSessionsApi,
 } from "../api/attendance.api";
@@ -38,6 +39,15 @@ export function SessionSection({ classId, enrollments, students }: Props) {
   const [createError, setCreateError] = useState<string | null>(null);
   const [sendingZalo, setSendingZalo] = useState(false);
   const [zaloResult, setZaloResult] = useState<string | null>(null);
+
+  const [createMode, setCreateMode] = useState<"single" | "bulk">("single");
+  const [bulkDays, setBulkDays] = useState<number[]>([]);
+  const [bulkFromDate, setBulkFromDate] = useState("");
+  const [bulkToDate, setBulkToDate] = useState("");
+  const [bulkMode, setBulkMode] = useState<"online" | "offline">("offline");
+  const [bulkStartTime, setBulkStartTime] = useState("");
+  const [bulkResult, setBulkResult] = useState<string | null>(null);
+  const [bulkCreating, setBulkCreating] = useState(false);
 
   useEffect(() => {
     listSessionsApi(classId)
@@ -89,6 +99,36 @@ export function SessionSection({ classId, enrollments, students }: Props) {
     }
   }
 
+  async function handleBulkCreate() {
+    if (bulkDays.length === 0) { setCreateError("Vui lòng chọn ít nhất một thứ."); return; }
+    if (!bulkFromDate || !bulkToDate) { setCreateError("Vui lòng chọn khoảng ngày."); return; }
+    if (bulkMode === "online" && !bulkStartTime) { setCreateError("Vui lòng nhập giờ bắt đầu cho buổi học online."); return; }
+    setBulkCreating(true);
+    setCreateError(null);
+    setBulkResult(null);
+    try {
+      const result = await bulkCreateSessionsApi(classId, {
+        days: bulkDays,
+        from_date: bulkFromDate,
+        to_date: bulkToDate,
+        mode: bulkMode,
+        start_time: bulkMode === "online" ? bulkStartTime : null,
+      });
+      setBulkResult(`Đã tạo ${result.created} buổi học${result.skipped > 0 ? `, bỏ qua ${result.skipped} ngày đã có` : ""}.`);
+      const updated = await listSessionsApi(classId);
+      setSessions(updated);
+      setBulkDays([]);
+      setBulkFromDate("");
+      setBulkToDate("");
+      setBulkMode("offline");
+      setBulkStartTime("");
+    } catch {
+      setCreateError("Không thể tạo hàng loạt. Vui lòng thử lại.");
+    } finally {
+      setBulkCreating(false);
+    }
+  }
+
   async function handleSendZalo() {
     if (!selectedSession || sendingZalo) return;
     setSendingZalo(true);
@@ -109,71 +149,184 @@ export function SessionSection({ classId, enrollments, students }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Create session form */}
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-ash uppercase tracking-wide">
-            Ngày buổi học
-          </label>
-          <input
-            type="date"
-            value={newDate}
-            onChange={(e) => setNewDate(e.target.value)}
-            className="border border-border rounded-sm px-3 py-2 text-sm text-ink bg-canvas focus:outline-none focus:border-primary"
-          />
+      {/* Create session — tab switcher */}
+      <div className="flex flex-col gap-3">
+        <div className="flex gap-1">
+          <button
+            type="button"
+            onClick={() => { setCreateMode("single"); setCreateError(null); setBulkResult(null); }}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-sm border transition-colors ${
+              createMode === "single" ? "bg-ink text-canvas border-ink" : "bg-canvas text-ash border-border hover:border-ink"
+            }`}
+          >
+            Tạo 1 buổi
+          </button>
+          <button
+            type="button"
+            onClick={() => { setCreateMode("bulk"); setCreateError(null); setBulkResult(null); }}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-sm border transition-colors ${
+              createMode === "bulk" ? "bg-ink text-canvas border-ink" : "bg-canvas text-ash border-border hover:border-ink"
+            }`}
+          >
+            Tạo hàng loạt
+          </button>
         </div>
-        {/* Mode toggle */}
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-ash uppercase tracking-wide">
-            Hình thức
-          </label>
-          <div className="flex gap-1">
+
+        {createMode === "single" && (
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold text-ash uppercase tracking-wide">
+                Ngày buổi học
+              </label>
+              <input
+                type="date"
+                value={newDate}
+                onChange={(e) => setNewDate(e.target.value)}
+                className="border border-border rounded-sm px-3 py-2 text-sm text-ink bg-canvas focus:outline-none focus:border-primary"
+              />
+            </div>
+            {/* Mode toggle */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold text-ash uppercase tracking-wide">
+                Hình thức
+              </label>
+              <div className="flex gap-1">
+                <button
+                  type="button"
+                  onClick={() => { setNewMode("offline"); setNewStartTime(""); setCreateError(null); }}
+                  className={`px-3 py-2 text-sm font-semibold rounded-sm border transition-colors ${
+                    newMode === "offline"
+                      ? "bg-ink text-canvas border-ink"
+                      : "bg-canvas text-ash border-border hover:border-ink"
+                  }`}
+                >
+                  Offline
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setNewMode("online"); setCreateError(null); }}
+                  className={`px-3 py-2 text-sm font-semibold rounded-sm border transition-colors ${
+                    newMode === "online"
+                      ? "bg-primary text-canvas border-primary"
+                      : "bg-canvas text-ash border-border hover:border-ink"
+                  }`}
+                >
+                  Online
+                </button>
+              </div>
+            </div>
+            {/* Start time — only when online */}
+            {newMode === "online" && (
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-ash uppercase tracking-wide">
+                  Giờ bắt đầu *
+                </label>
+                <input
+                  type="time"
+                  value={newStartTime}
+                  onChange={(e) => setNewStartTime(e.target.value)}
+                  className="border border-border rounded-sm px-3 py-2 text-sm text-ink bg-canvas focus:outline-none focus:border-primary"
+                />
+              </div>
+            )}
             <button
-              type="button"
-              onClick={() => { setNewMode("offline"); setNewStartTime(""); setCreateError(null); }}
-              className={`px-3 py-2 text-sm font-semibold rounded-sm border transition-colors ${
-                newMode === "offline"
-                  ? "bg-ink text-canvas border-ink"
-                  : "bg-canvas text-ash border-border hover:border-ink"
-              }`}
+              onClick={handleCreateSession}
+              disabled={!newDate || creating}
+              className="px-4 py-2 text-sm font-semibold text-canvas bg-primary rounded-sm hover:bg-primary-hover disabled:opacity-50 transition-colors"
             >
-              Offline
+              {creating ? "Đang tạo..." : "+ Tạo buổi"}
             </button>
-            <button
-              type="button"
-              onClick={() => { setNewMode("online"); setCreateError(null); }}
-              className={`px-3 py-2 text-sm font-semibold rounded-sm border transition-colors ${
-                newMode === "online"
-                  ? "bg-primary text-canvas border-primary"
-                  : "bg-canvas text-ash border-border hover:border-ink"
-              }`}
-            >
-              Online
-            </button>
-          </div>
-        </div>
-        {/* Start time — only when online */}
-        {newMode === "online" && (
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-semibold text-ash uppercase tracking-wide">
-              Giờ bắt đầu *
-            </label>
-            <input
-              type="time"
-              value={newStartTime}
-              onChange={(e) => setNewStartTime(e.target.value)}
-              className="border border-border rounded-sm px-3 py-2 text-sm text-ink bg-canvas focus:outline-none focus:border-primary"
-            />
           </div>
         )}
-        <button
-          onClick={handleCreateSession}
-          disabled={!newDate || creating}
-          className="px-4 py-2 text-sm font-semibold text-canvas bg-primary rounded-sm hover:bg-primary-hover disabled:opacity-50 transition-colors"
-        >
-          {creating ? "Đang tạo..." : "+ Tạo buổi"}
-        </button>
+
+        {createMode === "bulk" && (
+          <div className="flex flex-col gap-3">
+            {/* Day checkboxes */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold text-ash uppercase tracking-wide">Thứ trong tuần</label>
+              <div className="flex flex-wrap gap-1">
+                {["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map((label, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() =>
+                      setBulkDays((prev) =>
+                        prev.includes(idx) ? prev.filter((d) => d !== idx) : [...prev, idx]
+                      )
+                    }
+                    className={`px-2.5 py-1.5 text-xs font-semibold rounded-sm border transition-colors ${
+                      bulkDays.includes(idx)
+                        ? "bg-primary text-canvas border-primary"
+                        : "bg-canvas text-ash border-border hover:border-ink"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Date range */}
+            <div className="flex flex-wrap gap-3">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-ash uppercase tracking-wide">Từ ngày</label>
+                <input
+                  type="date"
+                  value={bulkFromDate}
+                  onChange={(e) => setBulkFromDate(e.target.value)}
+                  className="border border-border rounded-sm px-3 py-2 text-sm text-ink bg-canvas focus:outline-none focus:border-primary"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-ash uppercase tracking-wide">Đến ngày</label>
+                <input
+                  type="date"
+                  value={bulkToDate}
+                  onChange={(e) => setBulkToDate(e.target.value)}
+                  className="border border-border rounded-sm px-3 py-2 text-sm text-ink bg-canvas focus:outline-none focus:border-primary"
+                />
+              </div>
+            </div>
+
+            {/* Mode toggle */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold text-ash uppercase tracking-wide">Hình thức</label>
+              <div className="flex gap-1">
+                <button type="button" onClick={() => { setBulkMode("offline"); setBulkStartTime(""); setCreateError(null); }}
+                  className={`px-3 py-2 text-sm font-semibold rounded-sm border transition-colors ${bulkMode === "offline" ? "bg-ink text-canvas border-ink" : "bg-canvas text-ash border-border hover:border-ink"}`}>
+                  Offline
+                </button>
+                <button type="button" onClick={() => { setBulkMode("online"); setCreateError(null); }}
+                  className={`px-3 py-2 text-sm font-semibold rounded-sm border transition-colors ${bulkMode === "online" ? "bg-primary text-canvas border-primary" : "bg-canvas text-ash border-border hover:border-ink"}`}>
+                  Online
+                </button>
+              </div>
+            </div>
+
+            {bulkMode === "online" && (
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-ash uppercase tracking-wide">Giờ bắt đầu *</label>
+                <input
+                  type="time"
+                  value={bulkStartTime}
+                  onChange={(e) => setBulkStartTime(e.target.value)}
+                  className="border border-border rounded-sm px-3 py-2 text-sm text-ink bg-canvas focus:outline-none focus:border-primary"
+                />
+              </div>
+            )}
+
+            <button
+              onClick={handleBulkCreate}
+              disabled={bulkCreating || bulkDays.length === 0 || !bulkFromDate || !bulkToDate}
+              className="self-start px-4 py-2 text-sm font-semibold text-canvas bg-primary rounded-sm hover:bg-primary-hover disabled:opacity-50 transition-colors"
+            >
+              {bulkCreating ? "Đang tạo..." : "Tạo hàng loạt"}
+            </button>
+            {bulkResult && <p className="text-sm text-success">{bulkResult}</p>}
+          </div>
+        )}
       </div>
+
       {createError && (
         <p className="text-sm text-error">{createError}</p>
       )}

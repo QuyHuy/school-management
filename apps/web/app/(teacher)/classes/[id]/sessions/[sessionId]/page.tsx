@@ -76,6 +76,12 @@ export default function SessionDetailPage() {
   const [notifyResult, setNotifyResult] = useState<string | null>(null);
   const [notifyResultIsError, setNotifyResultIsError] = useState(false);
 
+  const [editingMode, setEditingMode] = useState(false);
+  const [editMode, setEditMode] = useState<"online" | "offline">("offline");
+  const [editStartTime, setEditStartTime] = useState("");
+  const [savingMode, setSavingMode] = useState(false);
+  const [modeError, setModeError] = useState<string | null>(null);
+
   useEffect(() => {
     async function load() {
       try {
@@ -93,6 +99,8 @@ export default function SessionDetailPage() {
         setStudents(studentsData);
         setAttendanceRecords(attendanceData);
         setNotes(sessionData.notes ?? "");
+        setEditMode(sessionData.mode);
+        setEditStartTime(sessionData.start_time?.slice(0, 5) ?? "");
       } catch {
         setError("Không thể tải thông tin buổi học. Vui lòng thử lại.");
       } finally {
@@ -140,6 +148,27 @@ export default function SessionDetailPage() {
       setNotifyResultIsError(true);
     } finally {
       setNotifying(false);
+    }
+  }
+
+  async function handleSaveMode() {
+    if (editMode === "online" && !editStartTime) {
+      setModeError("Vui lòng nhập giờ bắt đầu.");
+      return;
+    }
+    setSavingMode(true);
+    setModeError(null);
+    try {
+      const updated = await updateSessionApi(classId, sessionId, {
+        mode: editMode,
+        start_time: editMode === "online" ? editStartTime : null,
+      });
+      setSession(updated);
+      setEditingMode(false);
+    } catch {
+      setModeError("Không thể lưu. Vui lòng thử lại.");
+    } finally {
+      setSavingMode(false);
     }
   }
 
@@ -202,21 +231,62 @@ export default function SessionDetailPage() {
         <p className="text-sm text-ash">
           {cls.name} · {cls.subject}
         </p>
-        {/* Mode badge */}
-        <div className="flex items-center gap-2 mt-2">
-          {session.mode === "online" ? (
-            <span className="text-xs font-semibold text-primary bg-primary/8 border border-primary/20 rounded-full px-2.5 py-0.5">
-              Học Online
-            </span>
-          ) : (
-            <span className="text-xs font-semibold text-ash bg-surface border border-border rounded-full px-2.5 py-0.5">
-              Offline
-            </span>
-          )}
-          {session.start_time && (
-            <span className="text-sm text-ash">
-              {session.start_time.slice(0, 5)}
-            </span>
+
+        {/* Mode badge + inline edit */}
+        <div className="flex flex-col gap-2 mt-2">
+          <div className="flex items-center gap-2">
+            {session.mode === "online" ? (
+              <span className="text-xs font-semibold text-primary bg-primary/8 border border-primary/20 rounded-full px-2.5 py-0.5">
+                Học Online
+              </span>
+            ) : (
+              <span className="text-xs font-semibold text-ash bg-surface border border-border rounded-full px-2.5 py-0.5">
+                Offline
+              </span>
+            )}
+            {session.start_time && !editingMode && (
+              <span className="text-sm text-ash">{session.start_time.slice(0, 5)}</span>
+            )}
+            <button
+              onClick={() => { setEditingMode((v) => !v); setModeError(null); }}
+              className="text-xs text-ash hover:text-ink underline underline-offset-2 transition-colors"
+            >
+              {editingMode ? "Huỷ" : "Chỉnh sửa"}
+            </button>
+          </div>
+
+          {editingMode && (
+            <div className="flex flex-wrap items-end gap-3 p-3 rounded-sm border border-border bg-surface">
+              <div className="flex gap-1">
+                <button type="button" onClick={() => { setEditMode("offline"); setEditStartTime(""); setModeError(null); }}
+                  className={`px-3 py-1.5 text-sm font-semibold rounded-sm border transition-colors ${editMode === "offline" ? "bg-ink text-canvas border-ink" : "bg-canvas text-ash border-border hover:border-ink"}`}>
+                  Offline
+                </button>
+                <button type="button" onClick={() => { setEditMode("online"); setModeError(null); }}
+                  className={`px-3 py-1.5 text-sm font-semibold rounded-sm border transition-colors ${editMode === "online" ? "bg-primary text-canvas border-primary" : "bg-canvas text-ash border-border hover:border-ink"}`}>
+                  Online
+                </button>
+              </div>
+              {editMode === "online" && (
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-semibold text-ash uppercase tracking-wide">Giờ bắt đầu *</label>
+                  <input
+                    type="time"
+                    value={editStartTime}
+                    onChange={(e) => setEditStartTime(e.target.value)}
+                    className="border border-border rounded-sm px-3 py-2 text-sm text-ink bg-canvas focus:outline-none focus:border-primary"
+                  />
+                </div>
+              )}
+              <button
+                onClick={handleSaveMode}
+                disabled={savingMode}
+                className="px-4 py-2 text-sm font-semibold text-canvas bg-primary rounded-sm hover:bg-primary-hover disabled:opacity-50 transition-colors"
+              >
+                {savingMode ? "Đang lưu..." : "Lưu"}
+              </button>
+              {modeError && <p className="text-xs text-error">{modeError}</p>}
+            </div>
           )}
         </div>
 

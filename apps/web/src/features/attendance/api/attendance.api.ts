@@ -74,3 +74,21 @@ export async function listAttendanceApi(
   );
   return data;
 }
+
+export async function bulkCreateSessionsApi(
+  classId: string,
+  body: {
+    days: number[];
+    from_date: string;
+    to_date: string;
+    mode: "online" | "offline";
+    start_time: string | null;
+    notes?: string | null;
+  },
+): Promise<{ created: number; skipped: number }> {
+  const { data } = await apiClient.post<{ created: number; skipped: number }>(
+    `/classes/${classId}/sessions/bulk`,
+    body,
+  );
+  return data;
+}
