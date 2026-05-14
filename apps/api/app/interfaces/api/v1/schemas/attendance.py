@@ -69,3 +69,29 @@ class AttendanceRecordResponse(BaseModel):
     marked_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class BulkCreateSessionRequest(BaseModel):
+    days: list[int]
+    from_date: date
+    to_date: date
+    notes: str | None = None
+    mode: Literal["online", "offline"] = "offline"
+    start_time: time | None = None
+
+    @model_validator(mode="after")
+    def validate_bulk(self) -> BulkCreateSessionRequest:
+        if not self.days:
+            raise ValueError("Phải chọn ít nhất một thứ trong tuần")
+        if any(d < 0 or d > 6 for d in self.days):
+            raise ValueError("Thứ trong tuần phải từ 0 (Thứ 2) đến 6 (Chủ nhật)")
+        if self.from_date > self.to_date:
+            raise ValueError("Ngày bắt đầu phải trước ngày kết thúc")
+        if self.mode == "online" and self.start_time is None:
+            raise ValueError("Giờ bắt đầu là bắt buộc khi học online")
+        return self
+
+
+class BulkCreateSessionResponse(BaseModel):
+    created: int
+    skipped: int

@@ -185,3 +185,13 @@ class SQLAttendanceRepository(IAttendanceRepository):
             )
         )
         return {row for row in result.scalars()}
+
+    async def session_dates_in_range(self, class_id: UUID, from_date: date, to_date: date) -> set[date]:
+        result = await self._session.execute(
+            select(ClassSessionModel.date).where(
+                ClassSessionModel.class_id == class_id,
+                ClassSessionModel.date >= from_date,
+                ClassSessionModel.date <= to_date,
+            )
+        )
+        return {row for row in result.scalars()}

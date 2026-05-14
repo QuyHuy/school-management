@@ -6,6 +6,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from pydantic import ValidationError as PydanticValidationError
 
+from app.application.use_cases.attendance.bulk_create_sessions import BulkCreateSessionsUseCase
 from app.application.use_cases.attendance.create_session import CreateSessionUseCase
 from app.application.use_cases.attendance.update_session import UpdateSessionUseCase
 from app.domain.entities.attendance import ClassSession
@@ -127,3 +128,41 @@ async def test_update_start_time_without_mode_is_preserved():
     new_time = time(10, 0)
     session = await uc.execute(CLASS_ID, SESSION_ID, ORG_ID, None, mode=None, start_time=new_time)
     assert session.start_time == new_time
+
+
+
+@pytest.mark.asyncio
+async def test_bulk_create_skips_existing_dates():
+    from datetime import date as date_type
+    att_repo = _make_att_repo()
+    # monday 2026-05-18, wednesday 2026-05-20 are in range; monday already exists
+    att_repo.session_dates_in_range = AsyncMock(return_value={date_type(2026, 5, 18)})
+    att_repo.create_session = AsyncMock(side_effect=lambda s: s)
+    uc = BulkCreateSessionsUseCase(_make_class_repo(), att_repo)
+    # days=[0,2] = Mon+Wed, from 2026-05-18 to 2026-05-21
+    created, skipped = await uc.execute(
+        CLASS_ID, ORG_ID, [0, 2],
+        date_type(2026, 5, 18), date_type(2026, 5, 21),
+        None, "offline", None,
+    )
+    assert created == 1   # only wednesday 2026-05-20
+    assert skipped == 1   # monday 2026-05-18 already existed
+
+
+@pytest.mark.asyncio
+async def test_bulk_create_online_generates_links():
+    from datetime import date as date_type
+    att_repo = _make_att_repo()
+    att_repo.session_dates_in_range = AsyncMock(return_value=set())
+    created_sessions = []
+    att_repo.create_session = AsyncMock(side_effect=lambda s: created_sessions.append(s) or s)
+    uc = BulkCreateSessionsUseCase(_make_class_repo(), att_repo)
+    created, skipped = await uc.execute(
+        CLASS_ID, ORG_ID, [0],  # Mon only
+        date_type(2026, 5, 18), date_type(2026, 5, 18),  # just one day
+        None, "online", time(14, 0),
+    )
+    assert created == 1
+    assert skipped == 0
+    assert created_sessions[0].meet_link is not None
+    assert created_sessions[0].meet_link.startswith("https://meet.google.com/")

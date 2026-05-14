@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.application.use_cases.attendance.bulk_create_sessions import BulkCreateSessionsUseCase
 from app.application.use_cases.attendance.create_session import CreateSessionUseCase
 from app.application.use_cases.attendance.get_session import GetSessionUseCase
 from app.application.use_cases.attendance.list_attendance import ListAttendanceUseCase
@@ -18,6 +19,8 @@ from app.infrastructure.db.session import get_db
 from app.interfaces.api.v1.dependencies import require_role
 from app.interfaces.api.v1.schemas.attendance import (
     AttendanceRecordResponse,
+    BulkCreateSessionRequest,
+    BulkCreateSessionResponse,
     CreateSessionRequest,
     MarkAttendanceRequest,
     NotifyMeetResponse,
@@ -38,6 +41,21 @@ async def create_session(
 ):
     uc = CreateSessionUseCase(SQLClassRepository(db), SQLAttendanceRepository(db))
     return await uc.execute(class_id, token.org_id, body.date, body.notes, body.mode, body.start_time)
+
+
+@router.post("/{class_id}/sessions/bulk", response_model=BulkCreateSessionResponse, status_code=201)
+async def bulk_create_sessions(
+    class_id: UUID,
+    body: BulkCreateSessionRequest,
+    token=Depends(_teacher),
+    db: AsyncSession = Depends(get_db),
+):
+    uc = BulkCreateSessionsUseCase(SQLClassRepository(db), SQLAttendanceRepository(db))
+    created, skipped = await uc.execute(
+        class_id, token.org_id, body.days, body.from_date, body.to_date,
+        body.notes, body.mode, body.start_time,
+    )
+    return BulkCreateSessionResponse(created=created, skipped=skipped)
 
 
 @router.get("/{class_id}/sessions", response_model=list[SessionResponse])

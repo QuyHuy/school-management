@@ -45,3 +45,6 @@ class IAttendanceRepository(ABC):
 
     @abstractmethod
     async def session_ids_with_attendance(self, session_ids: list[UUID]) -> set[UUID]: ...
+
+    @abstractmethod
+    async def session_dates_in_range(self, class_id: UUID, from_date: date, to_date: date) -> set[date]: ...
