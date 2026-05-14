@@ -25,6 +25,12 @@ class UpdateSessionRequest(BaseModel):
     mode: Literal["online", "offline"] | None = None
     start_time: time | None = None
 
+    @model_validator(mode="after")
+    def start_time_required_when_switching_to_online(self) -> UpdateSessionRequest:
+        if self.mode == "online" and self.start_time is None:
+            raise ValueError("Giờ bắt đầu là bắt buộc khi học online")
+        return self
+
 
 class SessionResponse(BaseModel):
     id: UUID
@@ -32,7 +38,7 @@ class SessionResponse(BaseModel):
     date: date
     notes: str | None
     created_at: datetime
-    mode: str
+    mode: Literal["online", "offline"]
     start_time: time | None
     meet_link: str | None
 

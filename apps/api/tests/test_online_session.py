@@ -87,3 +87,30 @@ async def test_update_online_to_online_keeps_existing_link():
     uc = UpdateSessionUseCase(_make_class_repo(), att_repo)
     session = await uc.execute(CLASS_ID, SESSION_ID, ORG_ID, None, mode="online", start_time=time(14, 0))
     assert session.meet_link == existing_link
+
+
+@pytest.mark.asyncio
+async def test_update_online_to_offline_clears_link():
+    att_repo = _make_att_repo()
+    existing_link = "https://meet.google.com/abc-defg-hij"
+    att_repo.get_session = AsyncMock(return_value=ClassSession(
+        id=SESSION_ID, class_id=CLASS_ID, date=TODAY, notes=None,
+        created_at=MagicMock(), mode="online", start_time=time(14, 0), meet_link=existing_link,
+    ))
+    uc = UpdateSessionUseCase(_make_class_repo(), att_repo)
+    session = await uc.execute(CLASS_ID, SESSION_ID, ORG_ID, None, mode="offline", start_time=None)
+    assert session.meet_link is None
+    assert session.mode == "offline"
+
+
+@pytest.mark.asyncio
+async def test_update_start_time_without_mode_is_preserved():
+    att_repo = _make_att_repo()
+    att_repo.get_session = AsyncMock(return_value=ClassSession(
+        id=SESSION_ID, class_id=CLASS_ID, date=TODAY, notes=None,
+        created_at=MagicMock(), mode="online", start_time=time(14, 0), meet_link="https://meet.google.com/abc-defg-hij",
+    ))
+    uc = UpdateSessionUseCase(_make_class_repo(), att_repo)
+    new_time = time(10, 0)
+    session = await uc.execute(CLASS_ID, SESSION_ID, ORG_ID, None, mode=None, start_time=new_time)
+    assert session.start_time == new_time

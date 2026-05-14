@@ -81,7 +81,6 @@ async def notify_meet(
     class_id: UUID,
     session_id: UUID,
     token=Depends(_teacher),
-    db: AsyncSession = Depends(get_db),
 ):
     return NotifyMeetResponse(sent=False, message="Class channel chưa được setup")
 
