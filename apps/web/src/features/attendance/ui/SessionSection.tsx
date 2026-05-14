@@ -32,6 +32,8 @@ export function SessionSection({ classId, enrollments, students }: Props) {
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
   const [attendanceLoading, setAttendanceLoading] = useState(false);
   const [newDate, setNewDate] = useState("");
+  const [newMode, setNewMode] = useState<"online" | "offline">("offline");
+  const [newStartTime, setNewStartTime] = useState("");
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [sendingZalo, setSendingZalo] = useState(false);
@@ -60,12 +62,21 @@ export function SessionSection({ classId, enrollments, students }: Props) {
 
   async function handleCreateSession() {
     if (!newDate) return;
+    if (newMode === "online" && !newStartTime) {
+      setCreateError("Vui lòng nhập giờ bắt đầu cho buổi học online.");
+      return;
+    }
     setCreating(true);
     setCreateError(null);
     try {
-      const session = await createSessionApi(classId, newDate);
+      const session = await createSessionApi(classId, newDate, {
+        mode: newMode,
+        start_time: newMode === "online" ? newStartTime : null,
+      });
       setSessions((prev) => [session, ...prev]);
       setNewDate("");
+      setNewMode("offline");
+      setNewStartTime("");
       setSelectedSession(session);
       setAttendanceRecords([]);
     } catch (e: unknown) {
@@ -99,7 +110,7 @@ export function SessionSection({ classId, enrollments, students }: Props) {
   return (
     <div className="flex flex-col gap-4">
       {/* Create session form */}
-      <div className="flex items-end gap-3">
+      <div className="flex flex-wrap items-end gap-3">
         <div className="flex flex-col gap-1">
           <label className="text-xs font-semibold text-ash uppercase tracking-wide">
             Ngày buổi học
@@ -111,6 +122,50 @@ export function SessionSection({ classId, enrollments, students }: Props) {
             className="border border-border rounded-sm px-3 py-2 text-sm text-ink bg-canvas focus:outline-none focus:border-primary"
           />
         </div>
+        {/* Mode toggle */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-semibold text-ash uppercase tracking-wide">
+            Hình thức
+          </label>
+          <div className="flex gap-1">
+            <button
+              type="button"
+              onClick={() => { setNewMode("offline"); setNewStartTime(""); setCreateError(null); }}
+              className={`px-3 py-2 text-sm font-semibold rounded-sm border transition-colors ${
+                newMode === "offline"
+                  ? "bg-ink text-canvas border-ink"
+                  : "bg-canvas text-ash border-border hover:border-ink"
+              }`}
+            >
+              Offline
+            </button>
+            <button
+              type="button"
+              onClick={() => { setNewMode("online"); setCreateError(null); }}
+              className={`px-3 py-2 text-sm font-semibold rounded-sm border transition-colors ${
+                newMode === "online"
+                  ? "bg-primary text-canvas border-primary"
+                  : "bg-canvas text-ash border-border hover:border-ink"
+              }`}
+            >
+              Online
+            </button>
+          </div>
+        </div>
+        {/* Start time — only when online */}
+        {newMode === "online" && (
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-semibold text-ash uppercase tracking-wide">
+              Giờ bắt đầu *
+            </label>
+            <input
+              type="time"
+              value={newStartTime}
+              onChange={(e) => setNewStartTime(e.target.value)}
+              className="border border-border rounded-sm px-3 py-2 text-sm text-ink bg-canvas focus:outline-none focus:border-primary"
+            />
+          </div>
+        )}
         <button
           onClick={handleCreateSession}
           disabled={!newDate || creating}
@@ -134,7 +189,14 @@ export function SessionSection({ classId, enrollments, students }: Props) {
                 onClick={() => handleSelectSession(s)}
                 className="w-full flex items-center justify-between px-4 py-3 bg-canvas hover:bg-surface transition-colors text-left"
               >
-                <span className="text-sm font-medium text-ink">{formatDate(s.date)}</span>
+                <span className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-ink">{formatDate(s.date)}</span>
+                  {s.mode === "online" && (
+                    <span className="text-xs font-semibold text-primary bg-primary/8 border border-primary/20 rounded-full px-2 py-0.5">
+                      Online
+                    </span>
+                  )}
+                </span>
                 <span className="text-stone text-sm">
                   {selectedSession?.id === s.id ? "▲" : "▼"}
                 </span>
@@ -157,7 +219,7 @@ export function SessionSection({ classId, enrollments, students }: Props) {
                     <button
                       onClick={handleSendZalo}
                       disabled={sendingZalo}
-                      className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                      className="w-full rounded-md bg-ink px-4 py-2 text-sm font-medium text-canvas hover:opacity-80 disabled:opacity-50 transition-colors"
                     >
                       {sendingZalo ? "Đang gửi..." : "Gửi Zalo cho phụ huynh"}
                     </button>

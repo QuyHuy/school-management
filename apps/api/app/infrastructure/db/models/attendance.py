@@ -1,9 +1,18 @@
 from __future__ import annotations
 
 import uuid
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, time
 
-from sqlalchemy import CheckConstraint, Date, DateTime, ForeignKey, String, Text, UniqueConstraint
+from sqlalchemy import (
+    CheckConstraint,
+    Date,
+    DateTime,
+    ForeignKey,
+    String,
+    Text,
+    Time,
+    UniqueConstraint,
+)
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -18,6 +27,7 @@ class ClassSessionModel(Base):
     __tablename__ = "class_sessions"
     __table_args__ = (
         UniqueConstraint("class_id", "date", name="uq_session_date"),
+        CheckConstraint("mode IN ('online', 'offline')", name="ck_session_mode"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -26,6 +36,9 @@ class ClassSessionModel(Base):
     )
     date: Mapped[date] = mapped_column(Date, nullable=False)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    mode: Mapped[str] = mapped_column(String(10), nullable=False, default="offline", server_default="offline")
+    start_time: Mapped[time | None] = mapped_column(Time, nullable=True)
+    meet_link: Mapped[str | None] = mapped_column(String(100), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
 

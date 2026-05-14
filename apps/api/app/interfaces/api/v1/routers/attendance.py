@@ -20,6 +20,7 @@ from app.interfaces.api.v1.schemas.attendance import (
     AttendanceRecordResponse,
     CreateSessionRequest,
     MarkAttendanceRequest,
+    NotifyMeetResponse,
     SessionResponse,
     UpdateSessionRequest,
 )
@@ -36,7 +37,7 @@ async def create_session(
     db: AsyncSession = Depends(get_db),
 ):
     uc = CreateSessionUseCase(SQLClassRepository(db), SQLAttendanceRepository(db))
-    return await uc.execute(class_id, token.org_id, body.date, body.notes)
+    return await uc.execute(class_id, token.org_id, body.date, body.notes, body.mode, body.start_time)
 
 
 @router.get("/{class_id}/sessions", response_model=list[SessionResponse])
@@ -58,6 +59,30 @@ async def get_session(
 ):
     uc = GetSessionUseCase(SQLClassRepository(db), SQLAttendanceRepository(db))
     return await uc.execute(session_id, class_id, token.org_id)
+
+
+@router.patch("/{class_id}/sessions/{session_id}", response_model=SessionResponse)
+async def update_session(
+    class_id: UUID,
+    session_id: UUID,
+    body: UpdateSessionRequest,
+    token=Depends(_teacher),
+    db: AsyncSession = Depends(get_db),
+):
+    uc = UpdateSessionUseCase(SQLClassRepository(db), SQLAttendanceRepository(db))
+    return await uc.execute(class_id, session_id, token.org_id, body.notes, body.mode, body.start_time)
+
+
+@router.post(
+    "/{class_id}/sessions/{session_id}/notify-meet",
+    response_model=NotifyMeetResponse,
+)
+async def notify_meet(
+    class_id: UUID,
+    session_id: UUID,
+    token=Depends(_teacher),
+):
+    return NotifyMeetResponse(sent=False, message="Class channel chưa được setup")
 
 
 @router.put(
@@ -102,15 +127,3 @@ async def send_zalo_attendance(
 ):
     result = await SendZaloNotificationsUseCase(db).execute(session_id, token.org_id)
     return {"sent_count": result.sent_count, "skipped_count": result.skipped_count}
-
-
-@router.patch("/{class_id}/sessions/{session_id}", response_model=SessionResponse)
-async def update_session(
-    class_id: UUID,
-    session_id: UUID,
-    body: UpdateSessionRequest,
-    token=Depends(_teacher),
-    db: AsyncSession = Depends(get_db),
-):
-    uc = UpdateSessionUseCase(SQLClassRepository(db), SQLAttendanceRepository(db))
-    return await uc.execute(class_id, session_id, token.org_id, body.notes)

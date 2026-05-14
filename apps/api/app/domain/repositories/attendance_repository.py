@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from datetime import date
+from datetime import date, time
 from uuid import UUID
 
 from app.domain.entities.attendance import AttendanceRecord, ClassSession
@@ -30,7 +30,15 @@ class IAttendanceRepository(ABC):
     async def list_attendance(self, session_id: UUID) -> list[AttendanceRecord]: ...
 
     @abstractmethod
-    async def update_session_notes(self, session_id: UUID, class_id: UUID, notes: str | None) -> ClassSession | None: ...
+    async def update_session(
+        self,
+        session_id: UUID,
+        class_id: UUID,
+        notes: str | None,
+        mode: str,
+        start_time: time | None,
+        meet_link: str | None,
+    ) -> ClassSession | None: ...
 
     @abstractmethod
     async def list_sessions_in_month(self, class_ids: list[UUID], start: date, end: date) -> list[ClassSession]: ...
