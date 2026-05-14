@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { getSessionApi, listAttendanceApi, patchSessionNotesApi } from "@/src/features/attendance/api/attendance.api";
+import { getSessionApi, listAttendanceApi, updateSessionApi } from "@/src/features/attendance/api/attendance.api";
 import { getClassApi, listEnrollmentsApi } from "@/src/features/classes/api/classes.api";
 import { listStudentsApi } from "@/src/features/students/api/students.api";
 import { AttendanceSheet } from "@/src/features/attendance/ui/AttendanceSheet";
@@ -85,7 +85,7 @@ export default function SessionDetailPage() {
     setNotesError(null);
     setNotesSaved(false);
     try {
-      const updated = await patchSessionNotesApi(classId, sessionId, notes.trim() || null);
+      const updated = await updateSessionApi(classId, sessionId, { notes: notes.trim() || null });
       setSession(updated);
       setNotesSaved(true);
       setTimeout(() => setNotesSaved(false), 2000);
