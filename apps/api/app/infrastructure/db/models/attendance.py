@@ -27,6 +27,7 @@ class ClassSessionModel(Base):
     __tablename__ = "class_sessions"
     __table_args__ = (
         UniqueConstraint("class_id", "date", name="uq_session_date"),
+        CheckConstraint("mode IN ('online', 'offline')", name="ck_session_mode"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

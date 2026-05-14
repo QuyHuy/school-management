@@ -22,9 +22,13 @@ def upgrade() -> None:
     )
     op.execute("ALTER TABLE class_sessions ADD COLUMN IF NOT EXISTS start_time TIME")
     op.execute("ALTER TABLE class_sessions ADD COLUMN IF NOT EXISTS meet_link VARCHAR(100)")
+    op.execute(
+        "ALTER TABLE class_sessions ADD CONSTRAINT ck_session_mode CHECK (mode IN ('online', 'offline'))"
+    )
 
 
 def downgrade() -> None:
-    op.drop_column("class_sessions", "meet_link")
-    op.drop_column("class_sessions", "start_time")
-    op.drop_column("class_sessions", "mode")
+    op.execute("ALTER TABLE class_sessions DROP CONSTRAINT IF EXISTS ck_session_mode")
+    op.execute("ALTER TABLE class_sessions DROP COLUMN IF EXISTS meet_link")
+    op.execute("ALTER TABLE class_sessions DROP COLUMN IF EXISTS start_time")
+    op.execute("ALTER TABLE class_sessions DROP COLUMN IF EXISTS mode")
