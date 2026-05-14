@@ -18,3 +18,6 @@ class IStudentRepository(ABC):
 
     @abstractmethod
     async def get_next_student_code(self, base_code: str, org_id: UUID) -> str: ...
+
+    @abstractmethod
+    async def update_parent(self, student_id: UUID, org_id: UUID, parent_id: UUID) -> Student | None: ...

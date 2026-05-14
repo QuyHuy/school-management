@@ -47,8 +47,9 @@ export function ImportCSVModal({ open, onClose, onSuccess }: Props) {
       const result = await previewStudentImportApi(file);
       setPreview(result);
       setStep("preview");
-    } catch {
-      setError("Không thể đọc file. Vui lòng kiểm tra lại định dạng.");
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setError(detail ?? "Không thể đọc file. Vui lòng kiểm tra lại định dạng.");
     } finally {
       setLoading(false);
     }
@@ -64,8 +65,9 @@ export function ImportCSVModal({ open, onClose, onSuccess }: Props) {
         handleClose();
         onSuccess();
       }, 1500);
-    } catch {
-      setError("Có lỗi xảy ra khi tạo học sinh. Vui lòng thử lại.");
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setError(detail ?? "Có lỗi xảy ra khi tạo học sinh. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }

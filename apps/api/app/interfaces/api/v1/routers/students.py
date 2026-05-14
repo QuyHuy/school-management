@@ -10,9 +10,11 @@ from app.application.use_cases.students.bulk_import_students import (
 )
 from app.application.use_cases.students.create_student import CreateStudentUseCase, ParentInput
 from app.application.use_cases.students.get_student import GetStudentUseCase
+from app.application.use_cases.students.link_parent import LinkParentUseCase
 from app.application.use_cases.students.list_student_classes import ListStudentClassesUseCase
 from app.application.use_cases.students.list_students import ListStudentsUseCase
 from app.domain.entities.user import UserRole
+from app.domain.exceptions import ConflictError, NotFoundError, ValidationError
 from app.infrastructure.db.repositories.class_repository import SQLClassRepository
 from app.infrastructure.db.repositories.student_repository import SQLStudentRepository
 from app.infrastructure.db.repositories.user_repository import SQLUserRepository
@@ -26,6 +28,7 @@ from app.interfaces.api.v1.schemas.student import (
     ImportConfirmResponse,
     ImportPreviewResponse,
     ImportPreviewRow,
+    LinkParentRequest,
     ParentInfo,
     StudentResponse,
 )
@@ -143,6 +146,42 @@ def _row_to_schema(r: PreviewRow) -> ImportPreviewRow:
     return ImportPreviewRow(
         row=r.row, name=r.name, grade=r.grade,
         date_of_birth=r.date_of_birth, note=r.note, errors=r.errors,
+    )
+
+
+@router.patch("/{student_id}/parent", response_model=StudentResponse)
+async def link_parent(
+    student_id: UUID,
+    body: LinkParentRequest,
+    token=Depends(_teacher_or_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    parent_input = ParentInput(phone=body.phone, name=body.name, email=body.email, password=body.password)
+    uc = LinkParentUseCase(SQLStudentRepository(db), SQLUserRepository(db))
+    try:
+        student = await uc.execute(student_id, token.org_id, parent_input)
+    except NotFoundError:
+        raise HTTPException(status_code=404, detail="Không tìm thấy học sinh") from None
+    except ConflictError as e:
+        raise HTTPException(status_code=409, detail=str(e)) from e
+    except ValidationError as e:
+        raise HTTPException(status_code=422, detail=str(e)) from e
+    parent: ParentInfo | None = None
+    if student.parent_id:
+        user = await SQLUserRepository(db).get_by_id(student.parent_id)
+        if user:
+            parent = ParentInfo(name=user.name, email=user.email, phone=user.phone)
+    return StudentResponse(
+        id=student.id,
+        organization_id=student.organization_id,
+        name=student.name,
+        student_code=student.student_code,
+        grade=student.grade,
+        date_of_birth=student.date_of_birth,
+        note=student.note,
+        parent_id=student.parent_id,
+        parent=parent,
+        created_at=student.created_at,
     )
 
 

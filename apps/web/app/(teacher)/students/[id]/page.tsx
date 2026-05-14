@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import { getStudentApi, listStudentClassesApi } from "@/src/features/students/api/students.api";
+import { LinkParentSection } from "@/src/features/students/ui/LinkParentSection";
 import type { Student } from "@/src/features/students/model/types";
 import type { Class } from "@/src/features/classes/model/types";
 
@@ -127,7 +128,10 @@ export default function StudentDetailPage() {
             </div>
           </div>
         ) : (
-          <p className="text-sm text-ash">Chưa có tài khoản phụ huynh.</p>
+          <LinkParentSection
+            studentId={id}
+            onLinked={(updated) => setStudent(updated)}
+          />
         )}
       </section>
 

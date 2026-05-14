@@ -66,6 +66,22 @@ class SQLStudentRepository(IStudentRepository):
         )
         return [_to_domain(r) for r in result.scalars()]
 
+    async def update_parent(self, student_id: UUID, org_id: UUID, parent_id: UUID) -> Student | None:
+        result = await self._session.execute(
+            select(StudentModel).where(
+                StudentModel.id == student_id,
+                StudentModel.organization_id == org_id,
+                StudentModel.deleted_at.is_(None),
+            )
+        )
+        row = result.scalar_one_or_none()
+        if not row:
+            return None
+        row.parent_id = parent_id
+        await self._session.flush()
+        await self._session.refresh(row)
+        return _to_domain(row)
+
     async def get_next_student_code(self, base_code: str, org_id: UUID) -> str:
         result = await self._session.execute(
             select(StudentModel.student_code).where(

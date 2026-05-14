@@ -1,5 +1,5 @@
 import { apiClient } from "@/src/shared/api/client";
-import type { CheckParentResponse, CreateStudentRequest, ImportConfirmResponse, ImportPreviewResponse, ImportPreviewRow, Student } from "../model/types";
+import type { CheckParentResponse, CreateStudentRequest, ImportConfirmResponse, ImportPreviewResponse, ImportPreviewRow, ParentRequest, Student } from "../model/types";
 
 export async function listStudentsApi(): Promise<Student[]> {
   const { data } = await apiClient.get<Student[]>("/students");
@@ -43,7 +43,14 @@ export async function downloadStudentTemplateApi(): Promise<void> {
 export async function previewStudentImportApi(file: File): Promise<ImportPreviewResponse> {
   const form = new FormData();
   form.append("file", file);
-  const { data } = await apiClient.post<ImportPreviewResponse>("/students/import/preview", form);
+  const { data } = await apiClient.post<ImportPreviewResponse>("/students/import/preview", form, {
+    headers: { "Content-Type": undefined },
+  });
+  return data;
+}
+
+export async function linkParentApi(studentId: string, body: ParentRequest): Promise<Student> {
+  const { data } = await apiClient.patch<Student>(`/students/${studentId}/parent`, body);
   return data;
 }
 

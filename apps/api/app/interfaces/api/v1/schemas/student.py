@@ -66,6 +66,20 @@ class StudentResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class LinkParentRequest(BaseModel):
+    phone: str
+    name: str | None = None
+    email: EmailStr | None = None
+    password: str | None = None
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, v: str | None) -> str | None:
+        if v is not None and len(v) < 6:
+            raise ValueError("Mật khẩu phải có ít nhất 6 ký tự")
+        return v
+
+
 class ImportPreviewRow(BaseModel):
     row: int
     name: str
