@@ -9,4 +9,4 @@ def test_generate_meet_link_format():
 
 def test_generate_meet_link_is_random():
     links = {generate_meet_link() for _ in range(20)}
-    assert len(links) > 1
+    assert len(links) > 10
