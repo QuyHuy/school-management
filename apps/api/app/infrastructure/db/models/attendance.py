@@ -36,7 +36,7 @@ class ClassSessionModel(Base):
     )
     date: Mapped[date] = mapped_column(Date, nullable=False)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
-    mode: Mapped[str] = mapped_column(String(10), nullable=False, default="offline")
+    mode: Mapped[str] = mapped_column(String(10), nullable=False, default="offline", server_default="offline")
     start_time: Mapped[time | None] = mapped_column(Time, nullable=True)
     meet_link: Mapped[str | None] = mapped_column(String(100), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)

@@ -4,11 +4,13 @@ from datetime import date, time
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from pydantic import ValidationError as PydanticValidationError
 
 from app.application.use_cases.attendance.create_session import CreateSessionUseCase
 from app.application.use_cases.attendance.update_session import UpdateSessionUseCase
 from app.domain.entities.attendance import ClassSession
 from app.infrastructure.utils.meet import generate_meet_link
+from app.interfaces.api.v1.schemas.attendance import CreateSessionRequest, UpdateSessionRequest
 
 CLASS_ID = uuid.uuid4()
 ORG_ID = uuid.uuid4()
@@ -90,7 +92,7 @@ async def test_update_online_to_online_keeps_existing_link():
 
 
 @pytest.mark.asyncio
-async def test_update_online_to_offline_clears_link():
+async def test_update_online_to_offline_clears_link_and_start_time():
     att_repo = _make_att_repo()
     existing_link = "https://meet.google.com/abc-defg-hij"
     att_repo.get_session = AsyncMock(return_value=ClassSession(
@@ -100,7 +102,18 @@ async def test_update_online_to_offline_clears_link():
     uc = UpdateSessionUseCase(_make_class_repo(), att_repo)
     session = await uc.execute(CLASS_ID, SESSION_ID, ORG_ID, None, mode="offline", start_time=None)
     assert session.meet_link is None
+    assert session.start_time is None
     assert session.mode == "offline"
+
+
+def test_create_session_request_rejects_online_without_start_time():
+    with pytest.raises(PydanticValidationError):
+        CreateSessionRequest(date=TODAY, mode="online", start_time=None)
+
+
+def test_update_session_request_rejects_online_without_start_time():
+    with pytest.raises(PydanticValidationError):
+        UpdateSessionRequest(mode="online", start_time=None)
 
 
 @pytest.mark.asyncio
