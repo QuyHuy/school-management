@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { getSessionApi, listAttendanceApi, updateSessionApi } from "@/src/features/attendance/api/attendance.api";
+import { getSessionApi, listAttendanceApi, notifyMeetApi, updateSessionApi } from "@/src/features/attendance/api/attendance.api";
 import { getClassApi, listEnrollmentsApi } from "@/src/features/classes/api/classes.api";
 import { listStudentsApi } from "@/src/features/students/api/students.api";
 import { AttendanceSheet } from "@/src/features/attendance/ui/AttendanceSheet";
@@ -30,6 +30,23 @@ function formatDate(dateStr: string): string {
   return `${dd}/${mm}/${yyyy}`;
 }
 
+function CopyLinkButton({ link }: { link: string }) {
+  const [copied, setCopied] = useState(false);
+  async function handleCopy() {
+    await navigator.clipboard.writeText(link);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+  return (
+    <button
+      onClick={handleCopy}
+      className="rounded-sm border border-border bg-canvas px-3 py-1.5 text-xs font-semibold text-ash hover:text-ink hover:border-ink transition-colors"
+    >
+      {copied ? "Đã copy!" : "Copy"}
+    </button>
+  );
+}
+
 export default function SessionDetailPage() {
   const params = useParams();
   const classId = params.id as string;
@@ -48,6 +65,9 @@ export default function SessionDetailPage() {
   const [savingNotes, setSavingNotes] = useState(false);
   const [notesSaved, setNotesSaved] = useState(false);
   const [notesError, setNotesError] = useState<string | null>(null);
+
+  const [notifying, setNotifying] = useState(false);
+  const [notifyResult, setNotifyResult] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -93,6 +113,24 @@ export default function SessionDetailPage() {
       setNotesError("Không thể lưu ghi chú. Vui lòng thử lại.");
     } finally {
       setSavingNotes(false);
+    }
+  }
+
+  async function handleNotifyMeet() {
+    if (!session || notifying) return;
+    setNotifying(true);
+    setNotifyResult(null);
+    try {
+      const result = await notifyMeetApi(classId, sessionId);
+      setNotifyResult(
+        result.sent
+          ? "Đã gửi vào class channel ✓"
+          : "Tính năng đang phát triển — sẽ hoạt động sau khi setup class channel"
+      );
+    } catch {
+      setNotifyResult("Không thể gửi thông báo. Vui lòng thử lại.");
+    } finally {
+      setNotifying(false);
     }
   }
 
@@ -155,6 +193,46 @@ export default function SessionDetailPage() {
         <p className="text-sm text-ash">
           {cls.name} · {cls.subject}
         </p>
+        {/* Mode badge */}
+        <div className="flex items-center gap-2 mt-2">
+          {session.mode === "online" ? (
+            <span className="text-xs font-semibold text-primary bg-primary/8 border border-primary/20 rounded-full px-2.5 py-0.5">
+              Học Online
+            </span>
+          ) : (
+            <span className="text-xs font-semibold text-ash bg-surface border border-border rounded-full px-2.5 py-0.5">
+              Offline
+            </span>
+          )}
+          {session.start_time && (
+            <span className="text-sm text-ash">
+              {session.start_time.slice(0, 5)}
+            </span>
+          )}
+        </div>
+
+        {/* Meet link card — only when online */}
+        {session.mode === "online" && session.meet_link && (
+          <div className="mt-4 rounded-sm border border-border bg-surface px-4 py-3 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-sm text-ash shrink-0">🔗</span>
+              <span className="text-sm font-medium text-ink truncate">{session.meet_link}</span>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <CopyLinkButton link={session.meet_link} />
+              <button
+                onClick={handleNotifyMeet}
+                disabled={notifying}
+                className="rounded-sm border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/10 disabled:opacity-50 transition-colors"
+              >
+                {notifying ? "Đang gửi..." : "Gửi vào class channel"}
+              </button>
+            </div>
+          </div>
+        )}
+        {notifyResult && (
+          <p className="text-xs text-ash mt-2">{notifyResult}</p>
+        )}
       </div>
 
       {/* Section 1: Điểm danh */}
