@@ -34,7 +34,7 @@ export async function getSessionApi(classId: string, sessionId: string): Promise
 export async function updateSessionApi(
   classId: string,
   sessionId: string,
-  body: { notes?: string | null; mode?: "online" | "offline" | null; start_time?: string | null },
+  body: { notes?: string | null; mode?: "online" | "offline"; start_time?: string | null },
 ): Promise<ClassSession> {
   const { data } = await apiClient.patch<ClassSession>(
     `/classes/${classId}/sessions/${sessionId}`,
@@ -47,7 +47,7 @@ export async function notifyMeetApi(
   classId: string,
   sessionId: string,
 ): Promise<{ sent: boolean; message: string }> {
-  const { data } = await apiClient.post(
+  const { data } = await apiClient.post<{ sent: boolean; message: string }>(
     `/classes/${classId}/sessions/${sessionId}/notify-meet`,
   );
   return data;
