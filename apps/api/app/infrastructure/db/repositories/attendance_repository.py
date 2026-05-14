@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, time
 from uuid import UUID
 
 from sqlalchemy import select
@@ -19,6 +19,9 @@ def _session_to_domain(row: ClassSessionModel) -> ClassSession:
         date=row.date,
         notes=row.notes,
         created_at=row.created_at,
+        mode=row.mode,
+        start_time=row.start_time,
+        meet_link=row.meet_link,
     )
 
 
@@ -43,6 +46,9 @@ class SQLAttendanceRepository(IAttendanceRepository):
             class_id=session.class_id,
             date=session.date,
             notes=session.notes,
+            mode=session.mode,
+            start_time=session.start_time,
+            meet_link=session.meet_link,
         )
         self._session.add(row)
         await self._session.flush()
@@ -130,7 +136,15 @@ class SQLAttendanceRepository(IAttendanceRepository):
         )
         return [_record_to_domain(r) for r in result.scalars()]
 
-    async def update_session_notes(self, session_id: UUID, class_id: UUID, notes: str | None) -> ClassSession | None:
+    async def update_session(
+        self,
+        session_id: UUID,
+        class_id: UUID,
+        notes: str | None,
+        mode: str,
+        start_time: time | None,
+        meet_link: str | None,
+    ) -> ClassSession | None:
         result = await self._session.execute(
             select(ClassSessionModel).where(
                 ClassSessionModel.id == session_id,
@@ -141,6 +155,9 @@ class SQLAttendanceRepository(IAttendanceRepository):
         if not row:
             return None
         row.notes = notes
+        row.mode = mode
+        row.start_time = start_time
+        row.meet_link = meet_link
         await self._session.flush()
         await self._session.refresh(row)
         return _session_to_domain(row)
