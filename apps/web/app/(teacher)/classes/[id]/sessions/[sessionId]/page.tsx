@@ -32,17 +32,23 @@ function formatDate(dateStr: string): string {
 
 function CopyLinkButton({ link }: { link: string }) {
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
   async function handleCopy() {
-    await navigator.clipboard.writeText(link);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopyError(true);
+      setTimeout(() => setCopyError(false), 2000);
+    }
   }
   return (
     <button
       onClick={handleCopy}
       className="rounded-sm border border-border bg-canvas px-3 py-1.5 text-xs font-semibold text-ash hover:text-ink hover:border-ink transition-colors"
     >
-      {copied ? "Đã copy!" : "Copy"}
+      {copyError ? "Lỗi copy" : copied ? "Đã copy!" : "Copy"}
     </button>
   );
 }
@@ -68,6 +74,7 @@ export default function SessionDetailPage() {
 
   const [notifying, setNotifying] = useState(false);
   const [notifyResult, setNotifyResult] = useState<string | null>(null);
+  const [notifyResultIsError, setNotifyResultIsError] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -120,6 +127,7 @@ export default function SessionDetailPage() {
     if (!session || notifying) return;
     setNotifying(true);
     setNotifyResult(null);
+    setNotifyResultIsError(false);
     try {
       const result = await notifyMeetApi(classId, sessionId);
       setNotifyResult(
@@ -129,6 +137,7 @@ export default function SessionDetailPage() {
       );
     } catch {
       setNotifyResult("Không thể gửi thông báo. Vui lòng thử lại.");
+      setNotifyResultIsError(true);
     } finally {
       setNotifying(false);
     }
@@ -231,7 +240,7 @@ export default function SessionDetailPage() {
           </div>
         )}
         {notifyResult && (
-          <p className="text-xs text-ash mt-2">{notifyResult}</p>
+          <p className={`text-xs mt-2 ${notifyResultIsError ? "text-error" : "text-ash"}`}>{notifyResult}</p>
         )}
       </div>
 

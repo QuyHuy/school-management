@@ -130,7 +130,7 @@ export function SessionSection({ classId, enrollments, students }: Props) {
           <div className="flex gap-1">
             <button
               type="button"
-              onClick={() => { setNewMode("offline"); setNewStartTime(""); }}
+              onClick={() => { setNewMode("offline"); setNewStartTime(""); setCreateError(null); }}
               className={`px-3 py-2 text-sm font-semibold rounded-sm border transition-colors ${
                 newMode === "offline"
                   ? "bg-ink text-canvas border-ink"
@@ -141,7 +141,7 @@ export function SessionSection({ classId, enrollments, students }: Props) {
             </button>
             <button
               type="button"
-              onClick={() => setNewMode("online")}
+              onClick={() => { setNewMode("online"); setCreateError(null); }}
               className={`px-3 py-2 text-sm font-semibold rounded-sm border transition-colors ${
                 newMode === "online"
                   ? "bg-primary text-canvas border-primary"
@@ -219,7 +219,7 @@ export function SessionSection({ classId, enrollments, students }: Props) {
                     <button
                       onClick={handleSendZalo}
                       disabled={sendingZalo}
-                      className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                      className="w-full rounded-md bg-ink px-4 py-2 text-sm font-medium text-canvas hover:opacity-80 disabled:opacity-50 transition-colors"
                     >
                       {sendingZalo ? "Đang gửi..." : "Gửi Zalo cho phụ huynh"}
                     </button>
